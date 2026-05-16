@@ -1,0 +1,31 @@
+# Build output
+build/
+sdkconfig
+sdkconfig.old
+
+# Managed components (downloaded by IDF Component Manager)
+managed_components/
+dependencies.lock
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Compilation database (generated, can be regenerated)
+compile_commands.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Debug and crash logs
+crash-*.log
+core
+
+# Espressif tools artifacts
+.espressif/
