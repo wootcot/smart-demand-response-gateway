@@ -8,12 +8,14 @@ idf_component_register(
         "features/sensor/smoothing.c"
         "features/sensor/sensor_task.c"
         "features/network/network_task.c"
+        "features/relay/relay_control.c"
     INCLUDE_DIRS
         "."
     REQUIRES
         driver
         esp_adc
         freertos
-        esp_http_client
+        esp_websocket_client
+        esp_event
         log
 )

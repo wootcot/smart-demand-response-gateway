@@ -1,159 +1,198 @@
 /**
  * @file network_task.c
- * @brief Network synchronization task implementation for backend communication.
+ * @brief Network synchronization task using full-duplex WebSocket communication.
  *
- * Implements Task_NetworkSync which runs on Core 0 in a 10-second polling loop.
- * Each iteration reads the current smoothed power average from shared state,
- * constructs a JSON telemetry payload, POSTs it to the backend server using
- * esp_http_client, and processes the response for peak-stress instructions.
+ * Implements Task_NetworkSync which runs on Core 0 maintaining a persistent
+ * WebSocket connection to the backend control server. The connection enables:
+ *   - Low-latency telemetry streaming (gateway → backend)
+ *   - Instant peak-stress command reception (backend → gateway)
  *
- * Core 0 isolation ensures that HTTP latency (DNS resolution, TLS handshake,
- * server response time) cannot preempt or delay the sensor sampling task on
- * Core 1. The 10-second interval balances telemetry freshness against bandwidth
- * constraints typical of Nepal's residential internet connections.
+ * Unlike HTTP polling, the WebSocket connection remains open, allowing the
+ * backend to push load-shedding commands to the gateway with sub-second
+ * latency. Telemetry is still sent at configurable intervals, but peak-stress
+ * instructions arrive immediately without waiting for the next poll cycle.
+ *
+ * Core 0 isolation ensures that WebSocket I/O (TCP keepalives, frame parsing,
+ * reconnection attempts) cannot preempt the sensor sampling task on Core 1.
  */
 
 #include "features/network/network_task.h"
+#include "features/relay/relay_control.h"
 #include "core/config.h"
 #include "core/shared_state.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_http_client.h"
+#include "esp_websocket_client.h"
 #include "esp_log.h"
+#include "esp_event.h"
 
 #include <stdio.h>
 #include <string.h>
 
-/* Log tag for network task messages — used by ESP_LOGW/ESP_LOGI macros
- * to identify the source module in serial output. */
+/* Log tag for network task messages. */
 static const char *TAG = "network_task";
 
-/* Backend telemetry endpoint URL. In production this would be configured
- * via NVS or Kconfig, but a compile-time default enables initial development
- * and testing without runtime configuration infrastructure. */
-#define BACKEND_TELEMETRY_URL  "http://192.168.1.100:8080/telemetry"
+/* Backend WebSocket endpoint URL. The gateway_id query parameter identifies
+ * this device to the backend's connection hub for targeted command delivery. */
+#define BACKEND_WS_URL  "ws://192.168.1.100:8080/ws?gateway_id=esp32-gw-001"
 
-/* Maximum length of the JSON payload buffer. The telemetry payload is small
- * (gateway_id + power_watts), so 128 bytes provides ample headroom. */
+/* Maximum length of the JSON telemetry payload buffer. */
 #define PAYLOAD_BUFFER_SIZE    128
 
-/* HTTP response buffer size. The backend response contains an acknowledged
- * flag and peak_stress_active boolean — 256 bytes is sufficient. */
-#define RESPONSE_BUFFER_SIZE   256
+/* Flag indicating whether the WebSocket connection is currently established.
+ * Set by the event handler on CONNECTED, cleared on DISCONNECTED/ERROR. */
+static volatile bool s_ws_connected = false;
+
+/* Pointer to shared state, set during task initialization for use in the
+ * event callback which cannot receive arbitrary parameters. */
+static gateway_state_t *s_shared_state = NULL;
 
 /**
- * @brief Transmit telemetry data to the backend and process the response.
+ * @brief Handle peak-stress instruction received from the backend.
  *
- * Constructs a JSON payload with the current power reading, sends it via
- * HTTP POST, and parses the response for peak-stress instructions. Returns
- * true on successful communication, false on any failure.
+ * Parses the incoming WebSocket frame for peak_stress_active flag and
+ * triggers relay control on state transitions. This executes with minimal
+ * latency since the backend pushes commands immediately over the open connection.
  *
- * @param power_watts Current smoothed power average to report.
- * @return true if POST succeeded and response was received, false otherwise.
+ * @param data   Raw JSON data from the WebSocket frame.
+ * @param len    Length of the data buffer.
  */
-static bool network_post_telemetry(float power_watts)
+static void network_handle_ws_message(const char *data, int len)
 {
-    char payload[PAYLOAD_BUFFER_SIZE];
-    char response_buffer[RESPONSE_BUFFER_SIZE];
-    int content_length = 0;
-
-    /* Format the telemetry JSON payload. Using snprintf for safety against
-     * buffer overflow — the format string produces ~60 bytes maximum. */
-    snprintf(payload, sizeof(payload),
-             "{\"gateway_id\":\"esp32-gw-001\",\"power_watts\":%.2f}",
-             power_watts);
-
-    /* Configure the HTTP client for a POST request to the telemetry endpoint.
-     * Transport type is set explicitly to TCP (no TLS) for initial development;
-     * production deployments should upgrade to HTTPS with certificate pinning. */
-    esp_http_client_config_t config = {
-        .url = BACKEND_TELEMETRY_URL,
-        .method = HTTP_METHOD_POST,
-        .timeout_ms = 5000,
-    };
-
-    esp_http_client_handle_t client = esp_http_client_init(&config);
-    if (client == NULL) {
-        ESP_LOGW(TAG, "Failed to initialize HTTP client");
-        return false;
+    if (s_shared_state == NULL || data == NULL || len <= 0) {
+        return;
     }
 
-    /* Set content type and attach the JSON payload body. */
-    esp_http_client_set_header(client, "Content-Type", "application/json");
-    esp_http_client_set_post_field(client, payload, strlen(payload));
+    /* Parse peak-stress instruction from the backend's push message.
+     * The backend sends {"type":"peak_stress","peak_stress_active":true/false}
+     * or {"type":"ack","acknowledged":true,"peak_stress_active":true/false}. */
+    bool peak_active = (strnstr(data, "\"peak_stress_active\":true", len) != NULL);
+    bool was_active = shared_state_get_peak_stress(s_shared_state);
 
-    /* Execute the HTTP request. This blocks until response is received
-     * or the 5-second timeout expires. */
-    esp_err_t err = esp_http_client_perform(client);
+    shared_state_set_peak_stress(s_shared_state, peak_active);
 
-    if (err != ESP_OK) {
-        ESP_LOGW(TAG, "HTTP POST failed: %s", esp_err_to_name(err));
-        esp_http_client_cleanup(client);
-        return false;
+    /* Execute relay control only on state transitions to avoid redundant
+     * GPIO writes on every acknowledgment frame. */
+    if (peak_active && !was_active) {
+        ESP_LOGW(TAG, "Peak stress ACTIVATED via WebSocket — executing load shedding");
+        relay_shed_loads();
+    } else if (!peak_active && was_active) {
+        ESP_LOGI(TAG, "Peak stress CLEARED via WebSocket — restoring loads");
+        relay_restore_loads();
     }
+}
 
-    int status_code = esp_http_client_get_status_code(client);
-    content_length = esp_http_client_get_content_length(client);
+/**
+ * @brief WebSocket event handler callback.
+ *
+ * Processes connection lifecycle events and incoming data frames from the
+ * backend. Runs in the context of the esp_websocket_client task, so relay
+ * control calls here execute on Core 0 alongside the network task.
+ */
+static void websocket_event_handler(void *handler_args, esp_event_base_t base,
+                                     int32_t event_id, void *event_data)
+{
+    esp_websocket_event_data_t *ws_event = (esp_websocket_event_data_t *)event_data;
 
-    if (status_code == 200) {
-        ESP_LOGI(TAG, "Telemetry POST successful, response length=%d", content_length);
+    switch (event_id) {
+        case WEBSOCKET_EVENT_CONNECTED:
+            ESP_LOGI(TAG, "WebSocket connected to backend");
+            s_ws_connected = true;
+            break;
 
-        /* Read response body for peak-stress instructions.
-         * The backend returns JSON with a peak_stress_active flag that
-         * indicates whether the grid is under peak load conditions. */
-        if (content_length > 0 && content_length < RESPONSE_BUFFER_SIZE) {
-            int read_len = esp_http_client_read_response(client, response_buffer,
-                                                         sizeof(response_buffer) - 1);
-            if (read_len > 0) {
-                response_buffer[read_len] = '\0';
+        case WEBSOCKET_EVENT_DISCONNECTED:
+            ESP_LOGW(TAG, "WebSocket disconnected — will auto-reconnect");
+            s_ws_connected = false;
+            break;
 
-                /* Parse peak-stress instruction from response.
-                 * A simple string search suffices for the boolean flag;
-                 * a full JSON parser would add unnecessary code size for
-                 * this single-field extraction. */
-                if (strstr(response_buffer, "\"peak_stress_active\":true") != NULL) {
-                    ESP_LOGI(TAG, "Peak stress ACTIVE — shedding may be required");
-                } else {
-                    ESP_LOGI(TAG, "Peak stress inactive — normal operation");
-                }
+        case WEBSOCKET_EVENT_DATA:
+            /* Process incoming frames from the backend (peak-stress commands, acks). */
+            if (ws_event->op_code == 0x01 && ws_event->data_len > 0) {
+                /* Text frame received — parse for peak-stress instructions. */
+                network_handle_ws_message(ws_event->data_ptr, ws_event->data_len);
             }
-        }
-    } else {
-        ESP_LOGW(TAG, "Backend returned HTTP %d", status_code);
-    }
+            break;
 
-    esp_http_client_cleanup(client);
-    return (status_code == 200);
+        case WEBSOCKET_EVENT_ERROR:
+            ESP_LOGW(TAG, "WebSocket error occurred");
+            s_ws_connected = false;
+            break;
+
+        default:
+            break;
+    }
 }
 
 void Task_NetworkSync(void *pvParameters)
 {
-    gateway_state_t *state = (gateway_state_t *)pvParameters;
+    s_shared_state = (gateway_state_t *)pvParameters;
 
-    ESP_LOGI(TAG, "Network sync task started, poll interval=%dms",
+    ESP_LOGI(TAG, "Network sync task started (WebSocket mode), telemetry interval=%dms",
              NETWORK_POLL_INTERVAL_MS);
 
-    /* Infinite polling loop — the task never exits under normal operation.
-     * On communication failure, the loop continues to the next interval
-     * rather than halting, ensuring resilience against transient network issues. */
+    /* Configure the WebSocket client with automatic reconnection.
+     * The esp_websocket_client handles TCP connection management, frame parsing,
+     * ping/pong keepalives, and reconnection attempts internally. */
+    esp_websocket_client_config_t ws_cfg = {
+        .uri = BACKEND_WS_URL,
+        .reconnect_timeout_ms = 5000,
+        .network_timeout_ms = 10000,
+    };
+
+    esp_websocket_client_handle_t client = esp_websocket_client_init(&ws_cfg);
+    if (client == NULL) {
+        ESP_LOGE(TAG, "Failed to initialize WebSocket client");
+        /* Fall into idle loop to avoid watchdog trigger. */
+        for (;;) {
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+    }
+
+    /* Register event handler for connection lifecycle and incoming data. */
+    esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY,
+                                   websocket_event_handler, NULL);
+
+    /* Start the WebSocket client — this initiates the TCP connection and
+     * WebSocket handshake in the background. The client automatically
+     * reconnects on disconnection with exponential backoff. */
+    esp_err_t err = esp_websocket_client_start(client);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to start WebSocket client: %s", esp_err_to_name(err));
+        esp_websocket_client_destroy(client);
+        for (;;) {
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+    }
+
+    /* Telemetry transmission loop. Even though the WebSocket is full-duplex,
+     * we still send telemetry at regular intervals rather than on every ADC
+     * sample to avoid flooding the backend with 10 Hz data. The key advantage
+     * is that peak-stress commands arrive instantly via the event handler
+     * without waiting for this loop's next iteration. */
+    char payload[PAYLOAD_BUFFER_SIZE];
+
     for (;;) {
-        /* Read current smoothed average from shared state. The mutex is held
-         * only for the duration of the read (~microseconds), minimizing
-         * contention with the sensor task's write operations. */
-        float current_power = shared_state_read_average(state);
+        if (s_ws_connected) {
+            float current_power = shared_state_read_average(s_shared_state);
 
-        ESP_LOGI(TAG, "Current power average: %.2f W", current_power);
+            /* Format telemetry as JSON and send over the WebSocket connection.
+             * The backend acknowledges each frame with the current peak-stress state. */
+            int len = snprintf(payload, sizeof(payload),
+                "{\"type\":\"telemetry\",\"gateway_id\":\"esp32-gw-001\",\"power_watts\":%.2f}",
+                current_power);
 
-        /* Transmit telemetry to backend. On failure, log warning and continue —
-         * the next iteration will retry with fresh data. */
-        if (!network_post_telemetry(current_power)) {
-            ESP_LOGW(TAG, "Telemetry transmission failed, will retry next interval");
+            if (esp_websocket_client_send_text(client, payload, len, pdMS_TO_TICKS(1000)) < 0) {
+                ESP_LOGW(TAG, "Failed to send telemetry frame");
+            } else {
+                ESP_LOGI(TAG, "Telemetry sent: %.2f W", current_power);
+            }
+        } else {
+            ESP_LOGW(TAG, "WebSocket not connected, skipping telemetry");
         }
 
-        /* Delay for the configured polling interval before next transmission.
-         * vTaskDelay yields the CPU to lower-priority tasks during the wait,
-         * which is appropriate since network sync is not time-critical. */
+        /* Delay between telemetry transmissions. Peak-stress commands still
+         * arrive instantly via the event handler regardless of this interval. */
         vTaskDelay(pdMS_TO_TICKS(NETWORK_POLL_INTERVAL_MS));
     }
 }

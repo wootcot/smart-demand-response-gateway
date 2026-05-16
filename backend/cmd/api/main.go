@@ -11,55 +11,73 @@ import (
 
 	"github.com/smart-demand-response-gateway/backend/internal/features/gateway"
 	"github.com/smart-demand-response-gateway/backend/internal/features/telemetry"
+	ws "github.com/smart-demand-response-gateway/backend/internal/features/websocket"
 	"github.com/smart-demand-response-gateway/backend/internal/shared"
 )
 
 func main() {
-	// Configure structured JSON logger for production observability.
+	logger := setupLogger()
+
+	handlers := wireHandlers(logger)
+
+	srv := shared.NewServer(logger, handlers)
+
+	go startServer(srv, logger)
+
+	waitForShutdownSignal(logger)
+
+	gracefulShutdown(srv, logger)
+}
+
+// setupLogger configures a structured JSON logger for production observability.
+func setupLogger() *slog.Logger {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
 	slog.SetDefault(logger)
+	return logger
+}
 
-	// Instantiate in-memory repositories for each feature.
-	// These can be swapped for database-backed implementations without changing handlers.
+// wireHandlers instantiates repositories, creates feature handlers with injected
+// dependencies, and returns the composed handler registrations for the server router.
+func wireHandlers(logger *slog.Logger) []shared.HandlerRegistration {
 	telemetryRepo := telemetry.NewMemoryStore()
 	gatewayRepo := gateway.NewMemoryStore()
 
-	// Create feature handlers with injected repository dependencies.
 	telemetryHandler := telemetry.NewHandler(telemetryRepo, logger)
 	gatewayHandler := gateway.NewHandler(gatewayRepo)
 
-	// Compose handler registrations for the shared server router.
-	handlers := []shared.HandlerRegistration{
+	wsHub := ws.NewHub(logger)
+	wsHandler := ws.NewHandler(wsHub, telemetryRepo, logger)
+
+	return []shared.HandlerRegistration{
 		{Pattern: "POST /telemetry", Handler: telemetryHandler.HandlePostTelemetry},
 		{Pattern: "GET /status", Handler: gatewayHandler.HandleGetStatus},
+		{Pattern: "GET /ws", Handler: wsHandler.HandleWebSocket},
 	}
+}
 
-	// Create the HTTP server with default port (8080) and composed middleware stack.
-	srv := shared.NewServer(logger, handlers)
+// startServer begins listening for connections. Exits the process on fatal errors.
+func startServer(srv *shared.Server, logger *slog.Logger) {
+	if err := srv.Start(); err != nil {
+		logger.Error("server failed to start", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+}
 
-	// Start the server in a background goroutine so the main goroutine can
-	// block on OS signals for lifecycle management.
-	go func() {
-		if err := srv.Start(); err != nil {
-			logger.Error("server failed to start", slog.String("error", err.Error()))
-			os.Exit(1)
-		}
-	}()
-
-	// Block until a termination signal is received. This allows the server to run
-	// indefinitely until an operator or orchestrator requests shutdown.
+// waitForShutdownSignal blocks until SIGINT or SIGTERM is received.
+func waitForShutdownSignal(logger *slog.Logger) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	sig := <-quit
 	logger.Info("received shutdown signal", slog.String("signal", sig.String()))
+}
 
-	// Initiate graceful shutdown: drain active connections within the 15-second timeout.
+// gracefulShutdown drains active connections within the configured timeout.
+func gracefulShutdown(srv *shared.Server, logger *slog.Logger) {
 	if err := srv.Shutdown(); err != nil {
 		logger.Error("graceful shutdown failed", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
-
 	logger.Info("server exited cleanly")
 }

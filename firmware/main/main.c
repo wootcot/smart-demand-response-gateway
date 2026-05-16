@@ -19,6 +19,8 @@
 #include "core/shared_state.h"
 #include "features/sensor/sensor_task.h"
 #include "features/network/network_task.h"
+#include "features/relay/relay_control.h"
+#include "features/relay/relay_control.h"
 
 static const char *TAG = "main";
 
@@ -34,6 +36,22 @@ void app_main(void)
     esp_err_t err = shared_state_init(&g_gateway_state);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to initialize shared state: %s", esp_err_to_name(err));
+        return;
+    }
+
+    /* Initialize relay control GPIOs before network task starts issuing commands.
+     * Relays start de-energized (loads connected) as a fail-safe default. */
+    err = relay_control_init();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize relay control: %s", esp_err_to_name(err));
+        return;
+    }
+
+    /* Initialize relay control GPIOs for the opto-isolated relay array.
+     * Must complete before the network task starts issuing shed/restore commands. */
+    err = relay_control_init();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to initialize relay control: %s", esp_err_to_name(err));
         return;
     }
 

@@ -23,6 +23,7 @@ esp_err_t shared_state_init(gateway_state_t *state)
     memset(state->smoothing_buffer, 0, sizeof(state->smoothing_buffer));
     state->buffer_index = 0;
     state->current_avg_watts = 0.0f;
+    state->peak_stress_active = false;
 
     state->mutex = xSemaphoreCreateMutex();
     if (state->mutex == NULL) {
@@ -71,4 +72,32 @@ float shared_state_read_average(gateway_state_t *state)
 
     xSemaphoreGive(state->mutex);
     return avg;
+}
+
+esp_err_t shared_state_set_peak_stress(gateway_state_t *state, bool active)
+{
+    if (xSemaphoreTake(state->mutex, MUTEX_TIMEOUT_TICKS) != pdTRUE) {
+        return ESP_ERR_TIMEOUT;
+    }
+
+    state->peak_stress_active = active;
+
+    xSemaphoreGive(state->mutex);
+    return ESP_OK;
+}
+
+bool shared_state_get_peak_stress(gateway_state_t *state)
+{
+    bool active = false;
+
+    if (xSemaphoreTake(state->mutex, MUTEX_TIMEOUT_TICKS) != pdTRUE) {
+        /* Default to false on timeout — fail-safe keeps loads connected
+         * rather than shedding on a transient mutex contention. */
+        return false;
+    }
+
+    active = state->peak_stress_active;
+
+    xSemaphoreGive(state->mutex);
+    return active;
 }

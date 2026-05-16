@@ -17,6 +17,7 @@
 #define CORE_SHARED_STATE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "esp_err.h"
@@ -26,12 +27,14 @@
  * @brief Central shared state structure for the gateway.
  *
  * Holds the smoothing buffer, current write index, computed average,
- * and the mutex protecting concurrent access from dual-core tasks.
+ * peak stress flag from the backend, and the mutex protecting concurrent
+ * access from dual-core tasks.
  */
 typedef struct {
     float smoothing_buffer[SMOOTHING_SAMPLES];
     uint8_t buffer_index;
     float current_avg_watts;
+    bool peak_stress_active;
     SemaphoreHandle_t mutex;
 } gateway_state_t;
 
@@ -71,5 +74,26 @@ esp_err_t shared_state_write_sample(gateway_state_t *state, float sample);
  * @return Current smoothed average power in watts, or 0.0 on mutex timeout.
  */
 float shared_state_read_average(gateway_state_t *state);
+
+/**
+ * @brief Thread-safe write: update peak stress flag from backend instruction.
+ *
+ * Called by the network task after receiving a peak-stress instruction
+ * from the backend server. The relay control module reads this flag to
+ * determine whether to shed or restore loads.
+ *
+ * @param state  Pointer to the gateway state structure.
+ * @param active true if peak stress is active, false to clear.
+ * @return ESP_OK on success, ESP_ERR_TIMEOUT if mutex could not be acquired.
+ */
+esp_err_t shared_state_set_peak_stress(gateway_state_t *state, bool active);
+
+/**
+ * @brief Thread-safe read: get current peak stress state.
+ *
+ * @param state Pointer to the gateway state structure.
+ * @return true if peak stress is active, false otherwise (or on mutex timeout).
+ */
+bool shared_state_get_peak_stress(gateway_state_t *state);
 
 #endif /* CORE_SHARED_STATE_H */
