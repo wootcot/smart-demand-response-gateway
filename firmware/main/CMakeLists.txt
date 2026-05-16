@@ -3,12 +3,11 @@
 # and prevents accidental inclusion of test or scratch files.
 idf_component_register(
     SRCS
-        "main.c"
-        "core/shared_state.c"
-        "features/sensor/smoothing.c"
-        "features/sensor/sensor_task.c"
-        "features/network/network_task.c"
-        "features/relay/relay_control.c"
+        "main.cpp"
+        "core/gateway_state.cpp"
+        "features/sensor/current_sensor.cpp"
+        "features/network/network_client.cpp"
+        "features/relay/relay_controller.cpp"
     INCLUDE_DIRS
         "."
     REQUIRES
