@@ -26,6 +26,7 @@ bool CurrentSensor::init() noexcept
     // Configure ADC unit for oneshot mode (no ULP co-processor involvement)
     adc_oneshot_unit_init_cfg_t unit_cfg = {
         .unit_id = ADC_UNIT_ID,
+        .clk_src = ADC_RTC_CLK_SRC_DEFAULT,
         .ulp_mode = ADC_ULP_MODE_DISABLE,
     };
 

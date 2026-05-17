@@ -15,15 +15,15 @@
 
 #include <cstdint>
 #include "esp_adc/adc_oneshot.h"
-#include "driver/gpio.h"
+#include "driver/gpio.h"  // provided by esp_driver_gpio component
 
 // --- ADC Configuration ---
 // CT clamp (SCT-013) signal acquisition on GPIO34.
-// ADC_ATTEN_DB_11 provides full-scale voltage range (~0-3.1V) needed to
+// ADC_ATTEN_DB_12 provides full-scale voltage range (~0-3.1V) needed to
 // capture the CT clamp's output swing without clipping.
 inline constexpr adc_unit_t     ADC_UNIT_ID   = ADC_UNIT_1;
 inline constexpr adc_channel_t  ADC_CHAN       = ADC_CHANNEL_6;
-inline constexpr adc_atten_t    ADC_ATTEN_LVL = ADC_ATTEN_DB_11;
+inline constexpr adc_atten_t    ADC_ATTEN_LVL = ADC_ATTEN_DB_12;
 inline constexpr adc_bitwidth_t ADC_BW        = ADC_BITWIDTH_12;
 
 // TODO: Calibrate for actual SCT-013 variant and burden resistor.
