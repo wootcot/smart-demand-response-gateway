@@ -2,7 +2,7 @@
 
 .DEFAULT_GOAL := help
 
-.PHONY: help build run test lint clean tidy
+.PHONY: help build run dev test lint clean tidy
 
 help: ## Show this help message
 	@echo ""
@@ -16,6 +16,9 @@ build: ## Compile the backend server
 
 run: ## Run the backend server locally
 	go run ./cmd/api
+
+dev: ## Run with hot-reload using Air
+	air
 
 test: ## Run all backend tests
 	go test ./... -v
