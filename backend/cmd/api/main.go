@@ -48,12 +48,14 @@ func wireHandlers(logger *slog.Logger) []shared.HandlerRegistration {
 	gatewayHandler := gateway.NewHandler(gatewayRepo)
 
 	wsHub := ws.NewHub(logger)
-	wsHandler := ws.NewHandler(wsHub, telemetryRepo, logger)
+	dashboardHub := ws.NewDashboardHub(logger)
+	wsHandler := ws.NewHandler(wsHub, dashboardHub, telemetryRepo, gatewayRepo, logger)
 
 	return []shared.HandlerRegistration{
 		{Pattern: "POST /telemetry", Handler: telemetryHandler.HandlePostTelemetry},
 		{Pattern: "GET /status", Handler: gatewayHandler.HandleGetStatus},
 		{Pattern: "GET /ws", Handler: wsHandler.HandleWebSocket},
+		{Pattern: "GET /ws/dashboard", Handler: wsHandler.HandleDashboardWebSocket},
 	}
 }
 

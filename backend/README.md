@@ -13,7 +13,7 @@ backend/
 │   ├── features/
 │   │   ├── telemetry/         # Power reading ingestion (POST /telemetry)
 │   │   ├── gateway/           # Gateway status aggregation (GET /status)
-│   │   └── websocket/         # Full-duplex WebSocket channel (GET /ws)
+│   │   └── websocket/         # Full-duplex WebSocket channels (GET /ws, GET /ws/dashboard)
 │   └── shared/                # Common types, server, and middleware
 ├── go.mod
 ├── Makefile
@@ -22,11 +22,12 @@ backend/
 
 ## API Endpoints
 
-| Method | Path         | Description                                            |
-| ------ | ------------ | ------------------------------------------------------ |
-| POST   | `/telemetry` | Ingest a power reading from a gateway                  |
-| GET    | `/status`    | Retrieve all gateway statuses and total grid load      |
-| GET    | `/ws`        | WebSocket upgrade for persistent gateway communication |
+| Method | Path            | Description                                            |
+| ------ | --------------- | ------------------------------------------------------ |
+| POST   | `/telemetry`    | Ingest a power reading from a gateway                  |
+| GET    | `/status`       | Retrieve all gateway statuses and total grid load      |
+| GET    | `/ws`           | WebSocket upgrade for persistent gateway communication |
+| GET    | `/ws/dashboard` | WebSocket upgrade for real-time dashboard updates      |
 
 ### POST /telemetry
 
@@ -108,6 +109,34 @@ ws://localhost:8080/ws?gateway_id=esp32-gw-001
 }
 ```
 
+### GET /ws/dashboard
+
+Upgrades to a WebSocket connection for Flutter dashboard clients. The server pushes grid status updates in real time whenever gateway telemetry arrives — no polling required.
+
+```
+ws://localhost:8080/ws/dashboard
+```
+
+On connect, the server immediately sends the current grid status. Subsequent frames are pushed whenever any gateway reports new telemetry.
+
+**Outbound frame (server → dashboard):**
+
+```json
+{
+  "type": "dashboard_status",
+  "gateways": [
+    {
+      "gateway_id": "esp32-gw-001",
+      "last_seen": "2026-05-18T10:30:00Z",
+      "last_power_watts": 1450.5,
+      "peak_stress_active": false
+    }
+  ],
+  "total_load_watts": 1450.5,
+  "peak_active": false
+}
+```
+
 ## Middleware Stack
 
 Applied in order (outermost first):
@@ -167,8 +196,11 @@ The server listens for `SIGINT` and `SIGTERM`. On receipt it stops accepting new
 | Package                                                    | Purpose                                     |
 | ---------------------------------------------------------- | ------------------------------------------- |
 | `github.com/coder/websocket`                               | WebSocket server implementation             |
+| `github.com/google/uuid`                                   | Unique ID generation for dashboard clients  |
 | Standard library (`net/http`, `log/slog`, `encoding/json`) | HTTP server, structured logging, JSON codec |
 
 ## Storage
 
 Currently uses in-memory stores for both telemetry readings and gateway status. The repository interfaces (`TelemetryRepository`, `GatewayRepository`) are designed for easy swap to a persistent backend (e.g., PostgreSQL) without changing handler logic.
+
+Gateway status is updated automatically when telemetry arrives via the WebSocket channel — the WebSocket handler writes to both the telemetry store and the gateway store, keeping the `GET /status` endpoint and dashboard WebSocket in sync.

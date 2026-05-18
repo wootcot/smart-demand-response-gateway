@@ -10,6 +10,7 @@ import (
 
 	"github.com/coder/websocket"
 
+	"github.com/smart-demand-response-gateway/backend/internal/features/gateway"
 	"github.com/smart-demand-response-gateway/backend/internal/features/telemetry"
 )
 
@@ -18,16 +19,20 @@ import (
 // ingestion and peak-stress command delivery with sub-second latency.
 type Handler struct {
 	hub           *Hub
+	dashboardHub  *DashboardHub
 	telemetryRepo telemetry.TelemetryRepository
+	gatewayRepo   gateway.GatewayRepository
 	logger        *slog.Logger
 	peakStress    bool
 }
 
 // NewHandler creates a WebSocket handler wired to the hub and telemetry repository.
-func NewHandler(hub *Hub, telemetryRepo telemetry.TelemetryRepository, logger *slog.Logger) *Handler {
+func NewHandler(hub *Hub, dashboardHub *DashboardHub, telemetryRepo telemetry.TelemetryRepository, gatewayRepo gateway.GatewayRepository, logger *slog.Logger) *Handler {
 	return &Handler{
 		hub:           hub,
+		dashboardHub:  dashboardHub,
 		telemetryRepo: telemetryRepo,
+		gatewayRepo:   gatewayRepo,
 		logger:        logger,
 	}
 }
@@ -93,11 +98,13 @@ func (h *Handler) handleIncomingMessage(ctx context.Context, client *Client, dat
 		return
 	}
 
+	now := time.Now().UTC()
+
 	// Store the telemetry reading in the repository.
 	reading := telemetry.TelemetryReading{
 		GatewayID:  client.GatewayID,
 		PowerWatts: msg.PowerWatts,
-		Timestamp:  time.Now().UTC(),
+		Timestamp:  now,
 	}
 
 	if err := h.telemetryRepo.Store(ctx, reading); err != nil {
@@ -107,6 +114,24 @@ func (h *Handler) handleIncomingMessage(ctx context.Context, client *Client, dat
 		)
 		return
 	}
+
+	// Update gateway status so the /status endpoint and dashboard WebSocket
+	// reflect the latest reading from this gateway.
+	gwStatus := gateway.GatewayStatus{
+		GatewayID:        client.GatewayID,
+		LastSeen:         now,
+		LastPowerWatts:   msg.PowerWatts,
+		PeakStressActive: h.peakStress,
+	}
+	if err := h.gatewayRepo.UpdateStatus(ctx, gwStatus); err != nil {
+		h.logger.Error("failed to update gateway status",
+			slog.String("gateway_id", client.GatewayID),
+			slog.String("error", err.Error()),
+		)
+	}
+
+	// Broadcast updated grid status to all connected dashboard clients.
+	h.broadcastGridStatus(ctx)
 
 	// Send acknowledgment with current peak-stress state back to gateway.
 	// This provides immediate feedback on every telemetry frame, giving the
@@ -129,6 +154,102 @@ func (h *Handler) handleIncomingMessage(ctx context.Context, client *Client, dat
 		slog.String("gateway_id", client.GatewayID),
 		slog.Float64("power_watts", msg.PowerWatts),
 	)
+}
+
+// broadcastGridStatus computes the current grid status and pushes it to all
+// connected dashboard WebSocket clients.
+func (h *Handler) broadcastGridStatus(ctx context.Context) {
+	statuses, err := h.gatewayRepo.GetAll(ctx)
+	if err != nil {
+		h.logger.Error("failed to get gateway statuses for broadcast", slog.String("error", err.Error()))
+		return
+	}
+
+	var totalLoad float64
+	var peakActive bool
+	for _, gs := range statuses {
+		totalLoad += gs.LastPowerWatts
+		if gs.PeakStressActive {
+			peakActive = true
+		}
+	}
+
+	msg := DashboardStatusMessage{
+		Type:           MsgTypeDashboardStatus,
+		Gateways:       statuses,
+		TotalLoadWatts: totalLoad,
+		PeakActive:     peakActive,
+	}
+
+	h.dashboardHub.Broadcast(ctx, msg)
+}
+
+// HandleDashboardWebSocket upgrades HTTP connections to WebSocket for dashboard
+// clients. Dashboard clients receive real-time grid status pushes whenever
+// gateway telemetry arrives — no polling required.
+func (h *Handler) HandleDashboardWebSocket(w http.ResponseWriter, r *http.Request) {
+	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
+		InsecureSkipVerify: true,
+	})
+	if err != nil {
+		h.logger.Error("dashboard websocket upgrade failed", slog.String("error", err.Error()))
+		return
+	}
+
+	dashClient := NewDashboardClient(conn)
+	h.dashboardHub.Register(dashClient)
+
+	defer func() {
+		h.dashboardHub.Unregister(dashClient)
+		dashClient.Close()
+	}()
+
+	h.logger.Info("dashboard client connected", slog.String("id", dashClient.ID))
+
+	// Send initial grid status immediately on connect so the dashboard
+	// doesn't have to wait for the next telemetry frame.
+	h.broadcastGridStatusTo(r.Context(), dashClient)
+
+	// Keep the connection alive by reading (client may send pings or close).
+	ctx := r.Context()
+	for {
+		_, _, err := conn.Read(ctx)
+		if err != nil {
+			h.logger.Info("dashboard client disconnected",
+				slog.String("id", dashClient.ID),
+				slog.String("reason", err.Error()),
+			)
+			return
+		}
+	}
+}
+
+// broadcastGridStatusTo sends the current grid status to a single dashboard client.
+func (h *Handler) broadcastGridStatusTo(ctx context.Context, client *DashboardClient) {
+	statuses, err := h.gatewayRepo.GetAll(ctx)
+	if err != nil {
+		h.logger.Error("failed to get gateway statuses", slog.String("error", err.Error()))
+		return
+	}
+
+	var totalLoad float64
+	var peakActive bool
+	for _, gs := range statuses {
+		totalLoad += gs.LastPowerWatts
+		if gs.PeakStressActive {
+			peakActive = true
+		}
+	}
+
+	msg := DashboardStatusMessage{
+		Type:           MsgTypeDashboardStatus,
+		Gateways:       statuses,
+		TotalLoadWatts: totalLoad,
+		PeakActive:     peakActive,
+	}
+
+	data, _ := json.Marshal(msg)
+	_ = client.conn.Write(ctx, websocket.MessageText, data)
 }
 
 // SetPeakStress updates the peak stress state and broadcasts to all connected gateways.
