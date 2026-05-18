@@ -12,6 +12,12 @@ import 'package:flutter/material.dart';
 /// be replaced with the deployed server address via environment configuration.
 const String apiBaseUrl = 'http://localhost:8080';
 
+/// WebSocket URL for real-time dashboard status updates.
+///
+/// Connects to the dedicated dashboard WebSocket endpoint which pushes
+/// grid status updates whenever gateway telemetry arrives.
+const String dashboardWsUrl = 'ws://localhost:8080/ws/dashboard';
+
 /// Polling interval for fetching grid status from the backend.
 ///
 /// Matches the firmware network task's 10-second telemetry push cycle,
@@ -26,6 +32,10 @@ const Duration peakStressPollInterval = Duration(seconds: 3);
 ///
 /// Prevents the UI from hanging indefinitely if the backend is unreachable.
 const Duration httpRequestTimeout = Duration(seconds: 5);
+
+/// Delay before attempting to reconnect the dashboard WebSocket after a
+/// disconnection. Prevents aggressive reconnection loops on transient failures.
+const Duration wsReconnectDelay = Duration(seconds: 3);
 
 /// Color palette tokens for the Nepal Grid Peak Load Controller dashboard.
 ///

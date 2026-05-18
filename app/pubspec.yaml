@@ -44,6 +44,9 @@ dependencies:
   # HTTP client for backend communication
   http: ^1.4.0
 
+  # WebSocket client for real-time grid status updates
+  web_socket_channel: ^3.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

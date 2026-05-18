@@ -1,50 +1,69 @@
 /// Dashboard presentation screen for the Nepal Grid Peak Load Controller.
 ///
 /// Uses `HookConsumerWidget` from `hooks_riverpod` to combine Riverpod's
-/// reactive provider system with flutter_hooks for local state and lifecycle
-/// management. Displays real-time grid load status, connected gateway list,
-/// and peak stress indicator with periodic polling via `useEffect`.
+/// reactive provider system with flutter_hooks for local state management.
+/// Displays real-time grid load status, connected gateway list, and peak
+/// stress indicator via a persistent WebSocket connection to the backend.
 library;
-
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../core/constants.dart';
+import '../data/dashboard_websocket_service.dart';
 import '../domain/models.dart';
 import '../providers/dashboard_providers.dart';
 
 /// Main dashboard screen displaying grid telemetry and gateway status.
 ///
-/// Extends `HookConsumerWidget` to leverage both Riverpod's `ref.watch()`
-/// for reactive provider access and flutter_hooks (`useEffect`, `useState`)
-/// for timer-based polling and local ephemeral state.
+/// Connects to the backend via WebSocket for real-time updates. Shows a
+/// connection indicator and falls back to HTTP fetch for initial data load.
 class DashboardScreen extends HookConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Local state tracking whether peak stress polling is active.
-    final isPeakActive = useState(false);
+    // Track the latest grid status received via WebSocket.
+    final latestStatus = useState<GridStatus?>(null);
+    final connectionState = useState(WebSocketConnectionState.connecting);
+    final hasError = useState(false);
 
-    // Periodic refresh using useEffect to set up a timer-based polling loop.
-    // The interval shortens during peak stress events for more responsive updates.
-    useEffect(() {
-      final interval =
-          isPeakActive.value ? peakStressPollInterval : gridStatusPollInterval;
+    // Watch the WebSocket stream for real-time grid status updates.
+    final gridStatusStream = ref.watch(gridStatusStreamProvider);
+    final connStateStream = ref.watch(connectionStateProvider);
 
-      final timer = Timer.periodic(interval, (_) {
-        // Invalidate the provider to trigger a fresh fetch from the backend.
-        ref.invalidate(gridStatusProvider);
-      });
+    // Update local state from WebSocket stream.
+    gridStatusStream.when(
+      data: (status) {
+        latestStatus.value = status;
+        hasError.value = false;
+      },
+      loading: () {},
+      error: (_, _) {},
+    );
 
-      return timer.cancel;
-    }, [isPeakActive.value]);
+    // Update connection state from stream.
+    connStateStream.when(
+      data: (state) {
+        connectionState.value = state;
+        if (state == WebSocketConnectionState.disconnected) {
+          // Only show error if we never received data.
+          if (latestStatus.value == null) {
+            hasError.value = true;
+          }
+        }
+      },
+      loading: () {},
+      error: (_, _) {},
+    );
 
-    // Watch the grid status provider for reactive rebuilds on data changes.
-    final gridStatusAsync = ref.watch(gridStatusProvider);
+    // On first load, fetch via HTTP to show data immediately while
+    // WebSocket connection is being established.
+    final initialFetch = ref.watch(gridStatusProvider);
+
+    // Use WebSocket data if available, otherwise fall back to HTTP fetch.
+    final displayStatus = latestStatus.value;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -52,22 +71,52 @@ class DashboardScreen extends HookConsumerWidget {
         title: const Text('Nepal Grid Dashboard'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        actions: [
+          _buildConnectionIndicator(connectionState.value),
+        ],
       ),
-      body: gridStatusAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stackTrace) => _buildErrorState(context, ref, error),
-        data: (gridStatus) {
-          // Sync local peak state with server response for polling interval adjustment.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (isPeakActive.value != gridStatus.peakActive) {
-              isPeakActive.value = gridStatus.peakActive;
-            }
-          });
+      body: displayStatus != null
+          ? _buildDashboardContent(context, displayStatus)
+          : initialFetch.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              error: (error, _) => _buildErrorState(context, ref, error),
+              data: (gridStatus) {
+                // Seed local state with HTTP response until WebSocket takes over.
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (latestStatus.value == null) {
+                    latestStatus.value = gridStatus;
+                  }
+                });
+                return _buildDashboardContent(context, gridStatus);
+              },
+            ),
+    );
+  }
 
-          return _buildDashboardContent(context, gridStatus);
-        },
+  /// Builds a small connection status indicator in the app bar.
+  Widget _buildConnectionIndicator(WebSocketConnectionState state) {
+    final (color, tooltip) = switch (state) {
+      WebSocketConnectionState.connected => (
+          AppColors.gatewayOnline,
+          'Connected'
+        ),
+      WebSocketConnectionState.connecting => (
+          AppColors.gridElevated,
+          'Connecting...'
+        ),
+      WebSocketConnectionState.disconnected => (
+          AppColors.gatewayOffline,
+          'Disconnected'
+        ),
+    };
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 16.0),
+      child: Tooltip(
+        message: tooltip,
+        child: Icon(Icons.circle, color: color, size: 12),
       ),
     );
   }
@@ -102,7 +151,10 @@ class DashboardScreen extends HookConsumerWidget {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => ref.invalidate(gridStatusProvider),
+              onPressed: () {
+                ref.invalidate(gridStatusProvider);
+                ref.invalidate(dashboardWebSocketServiceProvider);
+              },
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
             ),
@@ -131,7 +183,6 @@ class DashboardScreen extends HookConsumerWidget {
 
   /// Displays the total grid load with semantic coloring based on load level.
   Widget _buildGridLoadCard(BuildContext context, GridStatus gridStatus) {
-    // Determine color based on grid state: peak stress > elevated > normal.
     final loadColor = gridStatus.peakActive
         ? AppColors.gridPeakStress
         : gridStatus.totalLoadWatts > 5000
@@ -271,7 +322,6 @@ class DashboardScreen extends HookConsumerWidget {
 
   /// Builds an individual gateway status tile.
   Widget _buildGatewayTile(BuildContext context, GatewayStatus gateway) {
-    // Consider a gateway offline if not seen in the last 30 seconds.
     final isOnline =
         DateTime.now().difference(gateway.lastSeen).inSeconds < 30;
     final statusColor =
