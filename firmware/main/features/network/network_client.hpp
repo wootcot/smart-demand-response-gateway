@@ -26,8 +26,6 @@ private:
     GatewayState& state;
     RelayController& relays;
 
-    static constexpr const char *WS_URL =
-        "ws://192.168.1.100:8080/ws?gateway_id=esp32-gw-001";
     static constexpr size_t PAYLOAD_BUFFER_SIZE = 128;
 
     void handle_message(const char *data, int len) noexcept;

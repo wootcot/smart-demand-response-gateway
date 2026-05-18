@@ -16,6 +16,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+#include "nvs_flash.h"
 
 #include "core/config.h"
 #include "core/gateway_state.hpp"
@@ -55,6 +56,14 @@ void Task_NetworkSync(void *pvParameters)
 
 extern "C" void app_main(void)
 {
+    // NVS is required by the Wi-Fi driver for RF calibration storage
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
     if (!gateway_state.init()) {
         ESP_LOGE(TAG, "Failed to initialize gateway state");
         return;

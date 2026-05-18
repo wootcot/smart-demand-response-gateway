@@ -7,6 +7,7 @@ idf_component_register(
         "core/gateway_state.cpp"
         "features/sensor/current_sensor.cpp"
         "features/network/network_client.cpp"
+        "features/network/wifi_station.cpp"
         "features/relay/relay_controller.cpp"
     INCLUDE_DIRS
         "."
@@ -17,5 +18,8 @@ idf_component_register(
         freertos
         esp_websocket_client
         esp_event
+        esp_wifi
+        esp_netif
+        nvs_flash
         log
 )

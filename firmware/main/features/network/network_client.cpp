@@ -12,6 +12,7 @@
  */
 
 #include "features/network/network_client.hpp"
+#include "features/network/wifi_station.hpp"
 #include "core/config.h"
 
 #include "esp_log.h"
@@ -87,6 +88,12 @@ void NetworkClient::event_handler(void *handler_args, esp_event_base_t base,
 
 bool NetworkClient::init() noexcept
 {
+    // Bring up Wi-Fi and TCP/IP stack before any network operations
+    if (!wifi_init_sta()) {
+        ESP_LOGE(TAG, "Wi-Fi initialization failed — cannot start WebSocket");
+        return false;
+    }
+
     esp_websocket_client_config_t ws_cfg = {};
     ws_cfg.uri = WS_URL;
     ws_cfg.reconnect_timeout_ms = 5000;

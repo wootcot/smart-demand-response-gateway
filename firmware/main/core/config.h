@@ -17,6 +17,21 @@
 #include "esp_adc/adc_oneshot.h"
 #include "driver/gpio.h"  // provided by esp_driver_gpio component
 
+// =============================================================================
+// USER CONFIGURATION — Update these values for your deployment
+// =============================================================================
+
+// Wi-Fi credentials (move to NVS or Kconfig for production)
+#define WIFI_SSID "YOUR_SSID"
+#define WIFI_PASS "YOUR_PASSWORD"
+
+// WebSocket backend URL (include gateway_id as query param)
+#define WS_URL "ws://192.168.1.100:8080/ws?gateway_id=esp32-gw-001"
+
+// =============================================================================
+// SYSTEM CONFIGURATION — Typically no changes needed below this line
+// =============================================================================
+
 // --- ADC Configuration ---
 // CT clamp (SCT-013) signal acquisition on GPIO34.
 // ADC_ATTEN_DB_12 provides full-scale voltage range (~0-3.1V) needed to
@@ -42,6 +57,13 @@ inline constexpr uint32_t SAMPLE_INTERVAL_MS = 100;
 // 30 samples × 100ms interval = 3000ms window, which suppresses inrush
 // current spikes from motor-driven appliances (typically 1-2 seconds).
 inline constexpr uint8_t SMOOTHING_WINDOW_SIZE = 30;
+
+// --- WiFi Configuration ---
+// Maximum number of connection retry attempts before giving up.
+inline constexpr int WIFI_MAX_RETRY = 10;
+
+// Timeout (ms) to wait for IP address acquisition after calling esp_wifi_start().
+inline constexpr uint32_t WIFI_CONNECT_TIMEOUT_MS = 30000;
 
 // --- Network Configuration ---
 // 10-second interval balances telemetry freshness against bandwidth
