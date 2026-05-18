@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../core/constants.dart';
+import '../../../core/theme.dart';
 import '../data/dashboard_websocket_service.dart';
 import '../domain/models.dart';
 import '../providers/dashboard_providers.dart';
@@ -66,21 +66,14 @@ class DashboardScreen extends HookConsumerWidget {
     final displayStatus = latestStatus.value;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Nepal Grid Dashboard'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        actions: [
-          _buildConnectionIndicator(connectionState.value),
-        ],
+        actions: [_buildConnectionIndicator(context, connectionState.value)],
       ),
       body: displayStatus != null
           ? _buildDashboardContent(context, displayStatus)
           : initialFetch.when(
-              loading: () => const Center(
-                child: CircularProgressIndicator(),
-              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, _) => _buildErrorState(context, ref, error),
               data: (gridStatus) {
                 // Seed local state with HTTP response until WebSocket takes over.
@@ -96,20 +89,25 @@ class DashboardScreen extends HookConsumerWidget {
   }
 
   /// Builds a small connection status indicator in the app bar.
-  Widget _buildConnectionIndicator(WebSocketConnectionState state) {
+  Widget _buildConnectionIndicator(
+    BuildContext context,
+    WebSocketConnectionState state,
+  ) {
+    final gridColors = Theme.of(context).extension<GridColors>()!;
+
     final (color, tooltip) = switch (state) {
       WebSocketConnectionState.connected => (
-          AppColors.gatewayOnline,
-          'Connected'
-        ),
+        gridColors.gatewayOnline,
+        'Connected',
+      ),
       WebSocketConnectionState.connecting => (
-          AppColors.gridElevated,
-          'Connecting...'
-        ),
+        gridColors.gridElevated,
+        'Connecting...',
+      ),
       WebSocketConnectionState.disconnected => (
-          AppColors.gatewayOffline,
-          'Disconnected'
-        ),
+        gridColors.gatewayOffline,
+        'Disconnected',
+      ),
     };
 
     return Padding(
@@ -123,31 +121,34 @@ class DashboardScreen extends HookConsumerWidget {
 
   /// Builds the error state UI with a retry action.
   Widget _buildErrorState(BuildContext context, WidgetRef ref, Object error) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.cloud_off,
               size: 64,
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 16),
             Text(
               'Connection Lost',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Unable to reach the grid backend.\n$error',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -183,14 +184,17 @@ class DashboardScreen extends HookConsumerWidget {
 
   /// Displays the total grid load with semantic coloring based on load level.
   Widget _buildGridLoadCard(BuildContext context, GridStatus gridStatus) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final gridColors = theme.extension<GridColors>()!;
+
     final loadColor = gridStatus.peakActive
-        ? AppColors.gridPeakStress
+        ? gridColors.gridPeakStress
         : gridStatus.totalLoadWatts > 5000
-            ? AppColors.gridElevated
-            : AppColors.gridNormal;
+        ? gridColors.gridElevated
+        : gridColors.gridNormal;
 
     return Card(
-      color: AppColors.surface,
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -199,9 +203,9 @@ class DashboardScreen extends HookConsumerWidget {
           children: [
             Text(
               'Total Grid Load',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 8),
             Row(
@@ -209,19 +213,19 @@ class DashboardScreen extends HookConsumerWidget {
               children: [
                 Text(
                   gridStatus.totalLoadWatts.toStringAsFixed(1),
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        color: loadColor,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: theme.textTheme.headlineLarge?.copyWith(
+                    color: loadColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(width: 4),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 4.0),
                   child: Text(
                     'W',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: loadColor,
-                        ),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: loadColor,
+                    ),
                   ),
                 ),
               ],
@@ -229,9 +233,9 @@ class DashboardScreen extends HookConsumerWidget {
             const SizedBox(height: 8),
             Text(
               '${gridStatus.gateways.length} gateway(s) reporting',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -241,8 +245,10 @@ class DashboardScreen extends HookConsumerWidget {
 
   /// Displays a prominent peak stress indicator when load shedding is active.
   Widget _buildPeakStressIndicator(BuildContext context, bool peakActive) {
+    final gridColors = Theme.of(context).extension<GridColors>()!;
+
     return Card(
-      color: peakActive ? AppColors.gridPeakStress : AppColors.gridNormal,
+      color: peakActive ? gridColors.gridPeakStress : gridColors.gridNormal,
       elevation: peakActive ? 4 : 1,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
@@ -261,18 +267,18 @@ class DashboardScreen extends HookConsumerWidget {
                   Text(
                     peakActive ? 'Peak Stress Active' : 'Grid Normal',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     peakActive
                         ? 'Load shedding in effect'
                         : 'Operating within normal parameters',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.white70),
                   ),
                 ],
               ),
@@ -285,7 +291,12 @@ class DashboardScreen extends HookConsumerWidget {
 
   /// Builds the connected gateways list section.
   Widget _buildGatewaysSection(
-      BuildContext context, List<GatewayStatus> gateways) {
+    BuildContext context,
+    List<GatewayStatus> gateways,
+  ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -293,23 +304,22 @@ class DashboardScreen extends HookConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4.0),
           child: Text(
             'Connected Gateways',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                ),
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
+            ),
           ),
         ),
         const SizedBox(height: 8),
         if (gateways.isEmpty)
           Card(
-            color: AppColors.surface,
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: Center(
                 child: Text(
                   'No gateways connected',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ),
@@ -322,44 +332,41 @@ class DashboardScreen extends HookConsumerWidget {
 
   /// Builds an individual gateway status tile.
   Widget _buildGatewayTile(BuildContext context, GatewayStatus gateway) {
-    final isOnline =
-        DateTime.now().difference(gateway.lastSeen).inSeconds < 30;
-    final statusColor =
-        isOnline ? AppColors.gatewayOnline : AppColors.gatewayOffline;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final gridColors = theme.extension<GridColors>()!;
+
+    final isOnline = DateTime.now().difference(gateway.lastSeen).inSeconds < 30;
+    final statusColor = isOnline
+        ? gridColors.gatewayOnline
+        : gridColors.gatewayOffline;
 
     return Card(
-      color: AppColors.surface,
       margin: const EdgeInsets.only(bottom: 8.0),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: statusColor.withValues(alpha: 0.2),
-          child: Icon(
-            Icons.router,
-            color: statusColor,
-          ),
+          child: Icon(Icons.router, color: statusColor),
         ),
         title: Text(
           gateway.gatewayId,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w500,
-              ),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         subtitle: Text(
           '${gateway.lastPowerWatts.toStringAsFixed(1)} W',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
         trailing: gateway.peakStressActive
-            ? const Icon(
+            ? Icon(
                 Icons.warning_amber_rounded,
-                color: AppColors.gridPeakStress,
+                color: gridColors.gridPeakStress,
               )
-            : Icon(
-                Icons.check_circle_outline,
-                color: statusColor,
-              ),
+            : Icon(Icons.check_circle_outline, color: statusColor),
       ),
     );
   }

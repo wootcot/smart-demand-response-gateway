@@ -8,7 +8,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'core/constants.dart';
+import 'core/theme.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 
 /// Application entry point.
@@ -20,11 +20,7 @@ import 'features/dashboard/presentation/dashboard_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(
-    const ProviderScope(
-      child: NepalGridApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: NepalGridApp()));
 }
 
 /// Root application widget for the Nepal Grid Peak Load Controller.
@@ -38,13 +34,7 @@ class NepalGridApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Nepal Grid Controller',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
+      theme: buildAppTheme(),
       home: const DashboardScreen(),
     );
   }
