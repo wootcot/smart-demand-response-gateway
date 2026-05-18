@@ -21,6 +21,12 @@ func (rw *responseWriter) WriteHeader(code int) {
 	rw.ResponseWriter.WriteHeader(code)
 }
 
+// Unwrap returns the underlying ResponseWriter so that WebSocket libraries
+// (e.g. nhooyr.io/websocket) can access http.Hijacker for connection upgrades.
+func (rw *responseWriter) Unwrap() http.ResponseWriter {
+	return rw.ResponseWriter
+}
+
 // LoggingMiddleware returns an HTTP middleware that logs each request using structured
 // logging via slog. It records the method, path, status code, and duration of each request.
 // Structured logging ensures operational messages are machine-parseable for production monitoring.
