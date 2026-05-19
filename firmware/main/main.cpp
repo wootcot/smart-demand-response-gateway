@@ -34,7 +34,9 @@ static NetworkClient network_client(gateway_state, relay_controller);
 
 void Task_ReadSensors(void *pvParameters)
 {
-    ESP_LOGI(TAG, "Sensor task started: %d-sample window, %ums interval",
+    ESP_LOGI(TAG, "Sensor task started: RMS over %d AC cycles (%dms), "
+             "%d-reading smoothing window, %ums interval",
+             RMS_CYCLE_COUNT, RMS_WINDOW_DURATION_MS,
              SMOOTHING_WINDOW_SIZE, SAMPLE_INTERVAL_MS);
 
     while (true) {

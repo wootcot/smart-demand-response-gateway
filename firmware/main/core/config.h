@@ -49,14 +49,28 @@ inline constexpr adc_bitwidth_t ADC_BW        = ADC_BITWIDTH_12;
 inline constexpr float CT_CALIBRATION_FACTOR = 1.82f;
 
 // --- Sampling Configuration ---
-// 100ms provides 10 Hz effective sampling rate — sufficient for residential
-// power monitoring while leaving CPU headroom for smoothing computation.
-inline constexpr uint32_t SAMPLE_INTERVAL_MS = 100;
+// 500ms interval between RMS measurement cycles. Each cycle performs a burst
+// of rapid ADC samples spanning RMS_CYCLE_COUNT AC cycles, then sleeps until
+// the next interval. This cadence balances measurement accuracy with CPU headroom.
+inline constexpr uint32_t SAMPLE_INTERVAL_MS = 500;
 
-// Number of samples in the rolling average smoothing window.
-// 30 samples × 100ms interval = 3000ms window, which suppresses inrush
-// current spikes from motor-driven appliances (typically 1-2 seconds).
-inline constexpr uint8_t SMOOTHING_WINDOW_SIZE = 30;
+// --- RMS Burst Sampling Configuration ---
+// Nepal grid frequency is 50 Hz → one AC cycle = 20ms.
+// We sample over RMS_CYCLE_COUNT full cycles to compute true RMS, which
+// correctly handles the sinusoidal waveform and suppresses startup inrush
+// surges that typically last 1-5 AC cycles.
+inline constexpr uint8_t  RMS_CYCLE_COUNT       = 25;       // 25 cycles × 20ms = 500ms window
+inline constexpr float    AC_CYCLE_PERIOD_MS    = 20.0f;    // 50 Hz → 20ms per cycle
+inline constexpr uint16_t RMS_WINDOW_DURATION_MS = static_cast<uint16_t>(RMS_CYCLE_COUNT * AC_CYCLE_PERIOD_MS); // 500ms
+inline constexpr uint16_t RMS_SAMPLES_PER_CYCLE = 40;       // 40 samples/cycle → 2kHz effective rate
+inline constexpr uint16_t RMS_TOTAL_SAMPLES     = RMS_CYCLE_COUNT * RMS_SAMPLES_PER_CYCLE; // 1000 samples
+inline constexpr uint16_t RMS_SAMPLE_INTERVAL_US = static_cast<uint16_t>(
+    (AC_CYCLE_PERIOD_MS * 1000.0f) / RMS_SAMPLES_PER_CYCLE); // 500µs between samples
+
+// Number of RMS readings in the rolling average smoothing window.
+// 6 readings × 500ms interval = 3000ms window, which further suppresses
+// motor inrush transients lasting 1-2 seconds beyond what RMS alone handles.
+inline constexpr uint8_t SMOOTHING_WINDOW_SIZE = 6;
 
 // --- WiFi Configuration ---
 // Maximum number of connection retry attempts before giving up.

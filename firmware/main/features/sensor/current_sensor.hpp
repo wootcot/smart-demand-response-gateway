@@ -1,15 +1,24 @@
 /**
  * @file current_sensor.hpp
- * @brief CT clamp current sensor with ADC sampling and rolling average smoothing.
+ * @brief CT clamp current sensor with true RMS measurement and rolling average smoothing.
  *
- * Encapsulates the ESP32 ADC oneshot driver, calibration, and a fixed-size
- * smoothing window into a single testable class. No heap allocations — the
- * smoothing buffer is a compile-time fixed array.
+ * Encapsulates the ESP32 ADC oneshot driver, calibration, RMS burst sampling,
+ * and a fixed-size smoothing window into a single testable class. No heap
+ * allocations — all buffers are compile-time fixed arrays.
  *
- * The smoothing window suppresses inrush current spikes from motor-driven
- * appliances (refrigerators, water pumps) which typically last 1-2 seconds.
- * A 3-second window (30 samples at 100ms intervals) ensures these transients
- * are averaged out before telemetry is transmitted to the backend.
+ * Measurement strategy (two-stage smoothing):
+ *   Stage 1 — True RMS over 25 AC cycles (500ms at 50Hz):
+ *     Burst-samples the CT clamp at ~2kHz (1000 samples), computes the
+ *     root-mean-square value. This correctly handles the sinusoidal AC
+ *     waveform and inherently rejects short startup inrush surges (which
+ *     typically last 1-5 AC cycles) by averaging their energy contribution
+ *     across the full 25-cycle window.
+ *
+ *   Stage 2 — Rolling average of RMS readings:
+ *     A 6-sample circular buffer (6 × 500ms = 3s) further suppresses
+ *     motor inrush transients lasting 1-2 seconds, ensuring the gateway
+ *     does not misinterpret a safe startup surge as an emergency grid
+ *     stress overload event.
  */
 
 #pragma once
@@ -24,9 +33,13 @@ private:
     adc_channel_t channel;
     float calibration_factor;
 
-    // Fixed-size circular buffer for rolling average (no heap allocations)
+    // Fixed-size circular buffer for rolling average of RMS readings (no heap)
     float smoothing_window[SMOOTHING_WINDOW_SIZE] = {0};
     uint8_t window_index = 0;
+
+    // Compute true RMS current over RMS_CYCLE_COUNT AC cycles via burst sampling.
+    // Returns RMS amperes, or -1.0f if the burst encountered too many ADC failures.
+    float compute_rms_amps() noexcept;
 
 public:
     // Explicit constructor ensuring hardware calibration parameters are injected
@@ -40,7 +53,7 @@ public:
     // Initialize ADC hardware. Must be called before read_smoothed_amps().
     bool init() noexcept;
 
-    // Read ADC, apply calibration, update smoothing window, return averaged amps.
-    // Returns last known average on ADC read failure (smoothing buffer unchanged).
+    // Perform RMS burst measurement, update smoothing window, return averaged RMS amps.
+    // Returns last known average on measurement failure (smoothing buffer unchanged).
     float read_smoothed_amps() noexcept;
 };
