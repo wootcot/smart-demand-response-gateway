@@ -14,7 +14,7 @@ idf_component_register(
     REQUIRES
         driver
         esp_driver_gpio
-        esp_adc
+        esp_driver_i2c
         freertos
         esp_websocket_client
         esp_event

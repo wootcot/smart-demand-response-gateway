@@ -6,77 +6,111 @@
  * timing parameters. These constants are shared across the sensor and network
  * feature modules to ensure consistent configuration without runtime overhead.
  *
- * ADC channel selection targets GPIO34 (ADC1_CHANNEL_6) which is an input-only
- * pin on ESP32-WROOM-32, chosen because it has no internal pull-up/pull-down
- * interference that could affect CT clamp signal accuracy.
+ * ADC acquisition uses an external ADS1115 16-bit delta-sigma ADC connected
+ * via I2C (GPIO22 SCL, GPIO21 SDA) at address 0x48 (ADDR pin tied to GND).
+ * This provides significantly better resolution and linearity than the ESP32's
+ * internal 12-bit SAR ADC for energy metering applications.
  */
 
 #pragma once
 
 #include <cstdint>
-#include "esp_adc/adc_oneshot.h"
-#include "driver/gpio.h"  // provided by esp_driver_gpio component
+#include "driver/i2c_master.h"
+#include "driver/gpio.h"
 
 // =============================================================================
 // USER CONFIGURATION — Update these values for your deployment
 // =============================================================================
 
 // Wi-Fi credentials (move to NVS or Kconfig for production)
-#define WIFI_SSID "YOUR_SSID"
-#define WIFI_PASS "YOUR_PASSWORD"
+#define WIFI_SSID "REDACTED"
+#define WIFI_PASS "REDACTED"
 
 // WebSocket backend URL (include gateway_id as query param)
-#define WS_URL "ws://192.168.1.100:8080/ws?gateway_id=esp32-gw-001"
+#define WS_URL "ws://192.168.101.4:8080/ws?gateway_id=esp32-gw-001"
 
 // =============================================================================
 // SYSTEM CONFIGURATION — Typically no changes needed below this line
 // =============================================================================
 
-// --- ADC Configuration ---
-// CT clamp (SCT-013) signal acquisition on GPIO34.
-// ADC_ATTEN_DB_12 provides full-scale voltage range (~0-3.1V) needed to
-// capture the CT clamp's output swing without clipping.
-inline constexpr adc_unit_t     ADC_UNIT_ID   = ADC_UNIT_1;
-inline constexpr adc_channel_t  ADC_CHAN       = ADC_CHANNEL_6;
-inline constexpr adc_atten_t    ADC_ATTEN_LVL = ADC_ATTEN_DB_12;
-inline constexpr adc_bitwidth_t ADC_BW        = ADC_BITWIDTH_12;
+// --- I2C Configuration ---
+// ADS1115 connected via I2C on default ESP32 hardware I2C pins.
+inline constexpr gpio_num_t I2C_SCL_PIN       = GPIO_NUM_22;
+inline constexpr gpio_num_t I2C_SDA_PIN       = GPIO_NUM_21;
+inline constexpr uint32_t   I2C_FREQ_HZ       = 400000;  // 400kHz Fast Mode
+
+// --- ADS1115 Configuration ---
+// ADDR pin tied to GND → I2C address 0x48
+inline constexpr uint8_t  ADS1115_ADDR        = 0x48;
+
+// ADS1115 register addresses
+inline constexpr uint8_t  ADS1115_REG_CONVERSION = 0x00;
+inline constexpr uint8_t  ADS1115_REG_CONFIG     = 0x01;
+
+// ADS1115 config register bit fields for CT sensor reading:
+//   [15]    OS=1        Start single conversion
+//   [14:12] MUX=100     AIN0 vs GND (single-ended, channel 0)
+//   [11:9]  PGA=001     ±4.096V full-scale (allows full 0-3.3V swing)
+//   [8]     MODE=0      Continuous conversion mode
+//   [7:5]   DR=111      860 SPS (maximum data rate)
+//   [4]     COMP_MODE=0 Traditional comparator
+//   [3]     COMP_POL=0  Active low
+//   [2]     COMP_LAT=0  Non-latching
+//   [1:0]   COMP_QUE=11 Disable comparator
+inline constexpr uint16_t ADS1115_CONFIG_CONTINUOUS =
+    (0b0 << 15) |   // OS: no effect in continuous mode
+    (0b100 << 12) | // MUX: AIN0 vs GND
+    (0b001 << 9) |  // PGA: ±4.096V
+    (0b0 << 8) |    // MODE: continuous
+    (0b111 << 5) |  // DR: 860 SPS
+    (0b0 << 4) |    // COMP_MODE: traditional
+    (0b0 << 3) |    // COMP_POL: active low
+    (0b0 << 2) |    // COMP_LAT: non-latching
+    (0b11 << 0);    // COMP_QUE: disable comparator
+
+// PGA full-scale voltage for ±4.096V gain setting.
+// LSB size = 4.096V / 32768 = 0.000125V = 125µV
+inline constexpr float ADS1115_LSB_VOLTAGE    = 0.000125f;
 
 // TODO: Calibrate for actual SCT-013 variant and burden resistor.
-// Current value (1.82) is a placeholder. Real calibration requires measuring
-// known load current with a reference meter and adjusting this factor to match.
-// Factor depends on: SCT-013 ratio (e.g. 30A/1V), burden resistor (e.g. 33Ω),
-// voltage divider bias (mid-rail 1.65V), and ADC reference voltage.
-inline constexpr float CT_CALIBRATION_FACTOR = 1.82f;
+// This factor converts the ADS1115 voltage reading to amperes.
+// Derivation: SCT-013-030 outputs 1V at 30A through 33Ω burden.
+// So current = voltage_across_burden / 33Ω * 30A_ratio
+// Simplified: amps = (adc_voltage - midpoint) * calibration_factor
+// The midpoint (1.65V) is subtracted in firmware before applying this factor.
+inline constexpr float CT_CALIBRATION_FACTOR  = 30.0f;  // 30A per 1V across burden
+
+// DC bias midpoint voltage (VCC/2 = 3.3V/2 = 1.65V)
+// The 10kΩ + 10kΩ voltage divider sets this reference level.
+inline constexpr float DC_BIAS_MIDPOINT_V     = 1.65f;
 
 // --- Sampling Configuration ---
-// 500ms interval between RMS measurement cycles. Each cycle performs a burst
-// of rapid ADC samples spanning RMS_CYCLE_COUNT AC cycles, then sleeps until
-// the next interval. This cadence balances measurement accuracy with CPU headroom.
-inline constexpr uint32_t SAMPLE_INTERVAL_MS = 500;
+// 500ms interval between RMS measurement cycles. Each cycle reads the ADS1115
+// in continuous mode at 860 SPS, collecting ~430 samples over 500ms.
+inline constexpr uint32_t SAMPLE_INTERVAL_MS  = 500;
 
 // --- RMS Burst Sampling Configuration ---
 // Nepal grid frequency is 50 Hz → one AC cycle = 20ms.
-// We sample over RMS_CYCLE_COUNT full cycles to compute true RMS, which
-// correctly handles the sinusoidal waveform and suppresses startup inrush
-// surges that typically last 1-5 AC cycles.
-inline constexpr uint8_t  RMS_CYCLE_COUNT       = 25;       // 25 cycles × 20ms = 500ms window
-inline constexpr float    AC_CYCLE_PERIOD_MS    = 20.0f;    // 50 Hz → 20ms per cycle
+// We sample over RMS_CYCLE_COUNT full cycles to compute true RMS.
+inline constexpr uint8_t  RMS_CYCLE_COUNT        = 25;       // 25 cycles × 20ms = 500ms window
+inline constexpr float    AC_CYCLE_PERIOD_MS     = 20.0f;    // 50 Hz → 20ms per cycle
 inline constexpr uint16_t RMS_WINDOW_DURATION_MS = static_cast<uint16_t>(RMS_CYCLE_COUNT * AC_CYCLE_PERIOD_MS); // 500ms
-inline constexpr uint16_t RMS_SAMPLES_PER_CYCLE = 40;       // 40 samples/cycle → 2kHz effective rate
-inline constexpr uint16_t RMS_TOTAL_SAMPLES     = RMS_CYCLE_COUNT * RMS_SAMPLES_PER_CYCLE; // 1000 samples
+
+// ADS1115 at 860 SPS → ~1.16ms per sample. Over 500ms we get ~430 samples.
+// That's ~17 samples per AC cycle — sufficient for true RMS of a 50Hz sine.
+inline constexpr uint16_t ADS1115_SPS            = 860;
+inline constexpr uint16_t RMS_TOTAL_SAMPLES      = static_cast<uint16_t>(
+    (RMS_WINDOW_DURATION_MS * ADS1115_SPS) / 1000);  // ~430 samples
 inline constexpr uint16_t RMS_SAMPLE_INTERVAL_US = static_cast<uint16_t>(
-    (AC_CYCLE_PERIOD_MS * 1000.0f) / RMS_SAMPLES_PER_CYCLE); // 500µs between samples
+    1000000 / ADS1115_SPS);  // ~1163µs between samples
 
 // Number of RMS readings in the rolling average smoothing window.
 // 6 readings × 500ms interval = 3000ms window, which further suppresses
 // motor inrush transients lasting 1-2 seconds beyond what RMS alone handles.
-inline constexpr uint8_t SMOOTHING_WINDOW_SIZE = 6;
+inline constexpr uint8_t SMOOTHING_WINDOW_SIZE   = 6;
 
 // --- WiFi Configuration ---
-// Maximum number of connection retry attempts before giving up.
-inline constexpr int WIFI_MAX_RETRY = 10;
-
-// Timeout (ms) to wait for IP address acquisition after calling esp_wifi_start().
+inline constexpr int      WIFI_MAX_RETRY         = 10;
 inline constexpr uint32_t WIFI_CONNECT_TIMEOUT_MS = 30000;
 
 // --- Network Configuration ---

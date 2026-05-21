@@ -4,11 +4,11 @@
  *
  * Orchestrates the dual-core FreeRTOS task architecture using statically
  * allocated class instances:
- *   - Sensor Task on Core 1 (priority 2): deterministic ADC sampling
+ *   - Sensor Task on Core 1 (priority 2): deterministic I2C/ADS1115 sampling
  *   - Network Task on Core 0 (priority 1): backend communication
  *
  * Core separation ensures network I/O latency (WiFi interrupts, TCP retransmits)
- * cannot introduce jitter into the 100ms ADC sampling loop.
+ * cannot introduce jitter into the 500ms ADS1115 sampling loop.
  *
  * All objects are statically allocated at compile time to protect the heap.
  */
@@ -28,7 +28,7 @@ static const char *TAG = "main";
 
 // Statically allocate all instances at compile time to protect the heap
 static GatewayState gateway_state;
-static CurrentSensor ct_sensor(ADC_CHAN, CT_CALIBRATION_FACTOR);
+static CurrentSensor ct_sensor(CT_CALIBRATION_FACTOR);
 static RelayController relay_controller;
 static NetworkClient network_client(gateway_state, relay_controller);
 
