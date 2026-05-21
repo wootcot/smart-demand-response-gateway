@@ -1,0 +1,876 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e")
+	(paper "A4")
+	(title_block
+		(title "CT Sensor Interface - SCT-013-030")
+		(date "2025-05-20")
+		(rev "1.0")
+		(company "Ailsh Giri")
+		(comment 1 "Non-invasive AC current sensing")
+		(comment 2 "33 Ohm burden resistor, DC bias at VCC/2, ADS1115 16-bit ADC")
+		(comment 3 "ADS1115 VDD=3.3V, ADDR=GND (0x48), I2C to ESP32")
+	)
+	(lib_symbols)
+	(text "CT SENSOR INTERFACE WITH ADS1115\nSCT-013 to Burden R (33 Ohm) to DC Bias Network to ADS1115 A0\nR2/R3 divider (10K each) provides VCC/2 (1.65V) midpoint bias\nC4 (10uF) filters bias midpoint noise\nC5 AC-couples CT signal into biased ADC input\nADS1115 VDD=3.3V, ADDR=GND (I2C addr 0x48)\nI2C SCL/SDA to ESP32 GPIO22/GPIO21\nD2/D3 Schottky clamps limit ADS1115 input to 0V-3.3V"
+		(exclude_from_sim no)
+		(at 25.4 95.25 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left)
+		)
+		(uuid "d50278c8-59f6-483a-a5e1-7560e3cae712")
+	)
+	(hierarchical_label "VCC_3V3"
+		(shape input)
+		(at 25.4 38.1 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "565ce86c-beb7-4352-9fce-16e168562366")
+	)
+	(hierarchical_label "I2C_SCL"
+		(shape bidirectional)
+		(at 165.1 50.8 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "919d04cf-bb48-4a1a-8bdd-89e55e041536")
+	)
+	(hierarchical_label "I2C_SDA"
+		(shape bidirectional)
+		(at 165.1 57.15 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a19d04cf-bb48-4a1a-8bdd-89e55e041537")
+	)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 25.4 76.2 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "d2c48247-d48b-43e6-ae47-b1a99b2a3b02")
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 63.5 57.15 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "10995cfb-535d-4f77-9607-131ef837b0de")
+		(property "Reference" "R1"
+			(at 67.31 55.88 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "33R 1%"
+			(at 67.31 58.42 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 63.5 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 57.15 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "89b0ad47-e549-492a-9d55-057d0f018172")
+		)
+		(pin "2"
+			(uuid "f9de10af-5b4e-4e9d-b522-cd860e908f89")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 120.65 57.15 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "5c4b65a8-aa27-40c7-95a8-4c8978897837")
+		(property "Reference" "C5"
+			(at 120.65 52.07 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10uF"
+			(at 120.65 54.61 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 120.65 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 120.65 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 120.65 57.15 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6d31906a-9564-4fcd-ad59-cfef30b8220b")
+		)
+		(pin "2"
+			(uuid "9a043aeb-e7e2-4fd2-ba3c-8c120f6ec912")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "C5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 88.9 69.85 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "60f73f95-0b4e-4a7b-823d-7b3055055f6d")
+		(property "Reference" "R3"
+			(at 92.71 68.58 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10K 1%"
+			(at 92.71 71.12 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 88.9 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 88.9 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 88.9 69.85 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f0d31672-fc32-4195-bb06-5a6f97aed072")
+		)
+		(pin "2"
+			(uuid "74fda34c-136f-4561-8e42-c9d38ff35402")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "R3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 101.6 69.85 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "7710bbf2-d4bf-46e6-9b85-e3a0408270d9")
+		(property "Reference" "C4"
+			(at 105.41 68.58 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10uF"
+			(at 105.41 71.12 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 101.6 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 101.6 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 101.6 69.85 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "8830c4db-cbef-4bae-9747-1b525fcbcd71")
+		)
+		(pin "2"
+			(uuid "991f6623-cc19-4174-9c82-e9f1101386ee")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "C4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 88.9 44.45 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "8a1090b5-cfbd-4ec2-888b-2ca67befed83")
+		(property "Reference" "R2"
+			(at 92.71 43.18 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10K 1%"
+			(at 92.71 45.72 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 88.9 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 88.9 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 88.9 44.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ebe76959-835e-43d7-952d-4e6dd6f37e82")
+		)
+		(pin "2"
+			(uuid "5ac88afb-6df7-442c-a830-452041d06fd3")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_Schottky")
+		(at 152.4 67.31 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "aebb1691-6ca4-46de-a7d5-3678bb5f4b12")
+		(property "Reference" "D3"
+			(at 156.21 67.31 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "BAT54"
+			(at 156.21 69.85 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SOD-323"
+			(at 152.4 67.31 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 152.4 67.31 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 152.4 67.31 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e4d76ffc-3ea4-4b1e-a714-43a279b61f93")
+		)
+		(pin "2"
+			(uuid "f2b9978d-a993-4c7d-b5b6-b851a7c08efa")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "D3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_Schottky")
+		(at 152.4 46.99 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b538874b-110b-4006-8e0d-31bba8641def")
+		(property "Reference" "D2"
+			(at 156.21 46.99 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "BAT54"
+			(at 156.21 49.53 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SOD-323"
+			(at 152.4 46.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 152.4 46.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 152.4 46.99 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "66aeb83b-f88e-48f7-a285-1afdb302f048")
+		)
+		(pin "2"
+			(uuid "f049a786-5aeb-41ad-9821-64a8101ce69c")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "D2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:AudioJack2")
+		(at 38.1 57.15 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b98a572c-4b1d-42f2-b16a-abec37e7e325")
+		(property "Reference" "J2"
+			(at 38.1 49.53 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SCT-013-030"
+			(at 38.1 52.07 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_Audio:Jack_3.5mm_Horizontal"
+			(at 38.1 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 38.1 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 38.1 57.15 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "T"
+			(uuid "8030f851-c102-40dc-8f09-83d80002b3ed")
+		)
+		(pin "S"
+			(uuid "f6411353-2ddc-4821-a4e8-6228cc421022")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "J2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 139.7 57.15 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "c68d8317-bb85-4241-af3b-ccfed3625652")
+		(property "Reference" "R4"
+			(at 139.7 52.07 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1K"
+			(at 139.7 54.61 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 139.7 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 139.7 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 139.7 57.15 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "c8a13818-6cf4-4fb0-a09a-a4dac9b74fcb")
+		)
+		(pin "2"
+			(uuid "50567722-76f5-4d14-9c47-aced2a3a316c")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "R4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Analog_ADC:ADS1115IDGS")
+		(at 139.7 38.1 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "f1a2b3c4-d5e6-f7a8-b9c0-d1e2f3a4b5c6")
+		(property "Reference" "U5"
+			(at 139.7 25.4 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "ADS1115IDGS"
+			(at 139.7 27.94 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_SO:TSSOP-10_3x3mm_P0.5mm"
+			(at 139.7 38.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/ads1115.pdf"
+			(at 139.7 38.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "16-bit ADC, 4-channel, I2C, 860SPS"
+			(at 139.7 38.1 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000001")
+		)
+		(pin "2"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000002")
+		)
+		(pin "3"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000003")
+		)
+		(pin "4"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000004")
+		)
+		(pin "5"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000005")
+		)
+		(pin "6"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000006")
+		)
+		(pin "7"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000007")
+		)
+		(pin "8"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000008")
+		)
+		(pin "9"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000009")
+		)
+		(pin "10"
+			(uuid "a1b2c3d4-0001-0001-0001-000000000010")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/c2b3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e"
+					(reference "U5")
+					(unit 1)
+				)
+			)
+		)
+	)
+)

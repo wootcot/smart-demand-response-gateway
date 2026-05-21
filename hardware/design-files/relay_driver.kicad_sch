@@ -1,0 +1,862 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f")
+	(paper "A4")
+	(title_block
+		(title "Relay Driver - Opto-Isolated Load Switching")
+		(date "2025-05-20")
+		(rev "1.0")
+		(company "Ailsh Giri")
+		(comment 1 "PC817 optocoupler + NPN transistor + relay")
+		(comment 2 "Galvanic isolation between 3.3V logic and 230V AC")
+		(comment 3 "Creepage greater than 6mm per IEC 60950-1")
+	)
+	(lib_symbols)
+	(text "OPTO-ISOLATED RELAY DRIVER\nESP32 GPIO (3.3V) to R5 (330 Ohm) to PC817 LED to GND\nPC817 phototransistor to R6 (1K) to Q1 Base\nQ1 Collector to Relay Coil (SRD-05VDC) to VCC_5V\nD4 flyback protection across coil\nD5 TVS across relay contacts for arc suppression"
+		(exclude_from_sim no)
+		(at 25.4 95.25 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left)
+		)
+		(uuid "c6de2c56-b2fa-4854-a21d-c26cef57fb60")
+	)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 25.4 82.55 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "5a8edef8-7384-4b2c-995a-39a24b03ff5b")
+	)
+	(hierarchical_label "RELAY_CMD"
+		(shape input)
+		(at 25.4 57.15 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "6df0acba-083d-43d0-967b-8ecb310db73d")
+	)
+	(hierarchical_label "VCC_5V"
+		(shape input)
+		(at 25.4 31.75 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "ed8737b0-3ad8-45e7-ae8d-a0bcdc564add")
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 107.95 27.94 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "0a798a90-964f-469f-8354-936f7bff9588")
+		(property "Reference" "R7"
+			(at 111.76 26.67 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "470R"
+			(at 111.76 29.21 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 107.95 27.94 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 107.95 27.94 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 107.95 27.94 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "af1de2b7-7cf3-404f-9cba-9eb270a5a0b8")
+		)
+		(pin "2"
+			(uuid "1bdf9f6e-efda-4fa9-bd41-9043d7c93a66")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "R7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Isolator:PC817")
+		(at 69.85 57.15 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "1c40b0b8-0da6-42bc-a3a5-6fd67f788269")
+		(property "Reference" "U3"
+			(at 69.85 46.99 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "PC817"
+			(at 69.85 49.53 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_DIP:DIP-4_W7.62mm"
+			(at 69.85 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.farnell.com/datasheets/73758.pdf"
+			(at 69.85 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 69.85 57.15 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "97023934-6d4d-4495-83eb-d9bc317f7530")
+		)
+		(pin "2"
+			(uuid "4bd12b43-8db9-4c35-97e2-e6052e1576a1")
+		)
+		(pin "3"
+			(uuid "c467b93e-2f99-4e0b-96eb-961412af3f9e")
+		)
+		(pin "4"
+			(uuid "765b4d7d-973a-4e63-b5bd-5d868ddce41b")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "U3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Screw_Terminal_01x03")
+		(at 165.1 44.45 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "2d9608a9-925b-4699-8392-7b7d57313730")
+		(property "Reference" "J3"
+			(at 165.1 34.29 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "LOAD_OUT"
+			(at 165.1 36.83 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "TerminalBlock:TerminalBlock_bornier-3_P5.08mm"
+			(at 165.1 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 165.1 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 165.1 44.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "c5d65ae2-0a0d-44da-8849-d187d7e6fac2")
+		)
+		(pin "2"
+			(uuid "24006b57-2e18-40ed-9960-31657767ef91")
+		)
+		(pin "3"
+			(uuid "efc6cd8d-558c-4c96-bad3-7bcc9d28e5b8")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "J3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 95.25 57.15 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "3d8cab29-5bb9-4e01-8e17-1b75c17fa6e6")
+		(property "Reference" "R6"
+			(at 95.25 52.07 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1K"
+			(at 95.25 54.61 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 95.25 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 95.25 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 95.25 57.15 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "050d8f7c-ee9a-440c-b7ee-62730f7ecc63")
+		)
+		(pin "2"
+			(uuid "5bc5a785-7954-4a89-a399-b23ad6c1c3ba")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "R6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D")
+		(at 120.65 38.1 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "491b0ba5-25cf-4d5f-9a21-6040f516b145")
+		(property "Reference" "D4"
+			(at 124.46 38.1 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1N4148"
+			(at 124.46 40.64 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SOD-323"
+			(at 120.65 38.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 120.65 38.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 120.65 38.1 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "90a66145-fa83-4b04-9371-71b642ed11cf")
+		)
+		(pin "2"
+			(uuid "dd8c7bd1-6e2c-413c-9803-6ccdc23863ac")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "D4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 44.45 57.15 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "6b9200a3-32c9-44d6-ae97-df1506606587")
+		(property "Reference" "R5"
+			(at 44.45 52.07 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "330R"
+			(at 44.45 54.61 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 44.45 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 44.45 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 44.45 57.15 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6b9835b4-cfcb-4767-9071-2d77284b8bc3")
+		)
+		(pin "2"
+			(uuid "bd33acd2-3719-4fcf-9f4a-048feb27d8b8")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "R5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Transistor_BJT:BC547")
+		(at 107.95 57.15 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "80ae8a50-9b32-4996-a8f2-c075fab30507")
+		(property "Reference" "Q1"
+			(at 113.03 55.88 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "BC547B"
+			(at 113.03 58.42 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_THT:TO-92_Inline"
+			(at 107.95 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.onsemi.com/pdf/datasheet/bc547-d.pdf"
+			(at 107.95 57.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 107.95 57.15 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "8e1ef1ce-cca6-49f8-bcdf-4586e7ba7551")
+		)
+		(pin "2"
+			(uuid "160b3dbb-d9b7-4d8c-a669-905c2fab7a8f")
+		)
+		(pin "3"
+			(uuid "6941c88a-d942-45b5-a448-a5ebd7e55014")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "Q1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED")
+		(at 107.95 38.1 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "8ca70fa0-72a1-475d-9cd1-79d50880e5c6")
+		(property "Reference" "D6"
+			(at 102.87 38.1 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "LED_Green"
+			(at 102.87 40.64 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
+			(at 107.95 38.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 107.95 38.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 107.95 38.1 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "19d31085-f518-4538-9998-d6d703f5f5da")
+		)
+		(pin "2"
+			(uuid "92003da4-ba86-4633-951a-d44c99e1109f")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "D6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_TVS_bidirectional")
+		(at 152.4 44.45 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "be6a3c7f-b84b-4254-a708-0318b1122be7")
+		(property "Reference" "D5"
+			(at 158.75 44.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "P6KE250CA"
+			(at 158.75 46.99 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_THT:D_DO-201_P15.24mm_Horizontal"
+			(at 152.4 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 152.4 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 152.4 44.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ef1cca23-fa86-4b5c-aa99-0eb9d07c79d6")
+		)
+		(pin "2"
+			(uuid "29c8f266-356e-43b5-8117-64baa77bbb1e")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "D5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Relay:SANYOU_SRD_Form_C")
+		(at 120.65 44.45 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "e80a99f8-0f97-4fcc-bd0e-4c9d60aff4f5")
+		(property "Reference" "K1"
+			(at 120.65 31.75 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SRD-05VDC-SL-C"
+			(at 120.65 34.29 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Relay_THT:Relay_SPDT_SANYOU_SRD_Series_Form_C"
+			(at 120.65 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 120.65 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 120.65 44.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "535a0272-879a-4adc-a0c9-33c3466c0361")
+		)
+		(pin "2"
+			(uuid "30abf9af-4ae7-4b19-8a80-95ff648db65d")
+		)
+		(pin "3"
+			(uuid "7ae79a81-959f-463b-931b-37955fa2ba0e")
+		)
+		(pin "4"
+			(uuid "b4a2c8c5-87f7-479e-8327-f103a0c31aa2")
+		)
+		(pin "5"
+			(uuid "a9774d83-e0c7-4105-9416-4349ec6bf644")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/d3c4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f"
+					(reference "K1")
+					(unit 1)
+				)
+			)
+		)
+	)
+)

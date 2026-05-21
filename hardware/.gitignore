@@ -1,0 +1,21 @@
+# KiCad lock files
+*.lck
+
+# KiCad backup files
+*-bak
+*-bak.*
+*.bak
+_autosave-*
+
+# KiCad temp files
+*.tmp
+*~
+
+# Footprint cache
+fp-info-cache
+
+# Netlist files (regenerated from schematic)
+*.net
+
+# DRC/ERC reports (regenerated on demand)
+*.rpt

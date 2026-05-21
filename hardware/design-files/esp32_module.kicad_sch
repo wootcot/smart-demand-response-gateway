@@ -1,0 +1,1002 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a")
+	(paper "A4")
+	(title_block
+		(title "ESP32 Module - Edge Controller")
+		(date "2025-05-20")
+		(rev "1.0")
+		(company "Ailsh Giri")
+		(comment 1 "ESP32-WROOM-32 with WiFi/BT")
+		(comment 2 "I2C to ADS1115 (GPIO22 SCL, GPIO21 SDA), GPIO for relay control")
+		(comment 3 "UART for debug/OTA, EN/BOOT for programming")
+	)
+	(lib_symbols)
+	(text "ESP32 MODULE\nGPIO22 (SCL): I2C Clock to ADS1115\nGPIO21 (SDA): I2C Data to ADS1115\nGPIO4: Relay command output\nGPIO2: WiFi status LED\nGPIO1 (TX0): UART TX\nGPIO3 (RX0): UART RX\nEN: 10K pull-up + reset button\nGPIO0: Boot mode select"
+		(exclude_from_sim no)
+		(at 25.4 114.3 0)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left)
+		)
+		(uuid "bfe39690-665c-40a8-9d90-1636204e3233")
+	)
+	(hierarchical_label "GND"
+		(shape input)
+		(at 25.4 101.6 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "0b735d92-0fbe-434f-89b7-3fe6af374443")
+	)
+	(hierarchical_label "RX"
+		(shape input)
+		(at 177.8 69.85 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4868ce6f-5279-461a-8a30-3d100dbf73eb")
+	)
+	(hierarchical_label "GPIO_RELAY"
+		(shape output)
+		(at 25.4 69.85 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "7534e43f-ffd9-47d4-857e-9fa281a40f9e")
+	)
+	(hierarchical_label "I2C_SCL"
+		(shape bidirectional)
+		(at 25.4 57.15 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "a925a35a-7727-463e-85b0-c3c1e601a8ba")
+	)
+	(hierarchical_label "I2C_SDA"
+		(shape bidirectional)
+		(at 25.4 63.5 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "f7a8b9c0-d1e2-f3a4-b5c6-d7e8f9a0b1c2")
+	)
+	(hierarchical_label "VCC_3V3"
+		(shape input)
+		(at 25.4 38.1 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "bdd12c50-776c-47ee-a662-9c16fd8e878d")
+	)
+	(hierarchical_label "TX"
+		(shape output)
+		(at 177.8 63.5 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e53878cd-4a01-4cc7-bdd4-6cfaffb46e68")
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 50.8 44.45 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "0423f0fb-2da0-47b7-8317-8c4bd9844ba8")
+		(property "Reference" "C7"
+			(at 54.61 43.18 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10uF"
+			(at 54.61 45.72 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+			(at 50.8 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 50.8 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 50.8 44.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "0c2bdea1-0fc9-4685-8307-3a714bcfc44a")
+		)
+		(pin "2"
+			(uuid "bab8bdce-42d5-4c52-86d0-a3609f7085f9")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "C7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_Push")
+		(at 76.2 95.25 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "20dfa05b-5fd8-454d-90b5-216524a9541d")
+		(property "Reference" "SW2"
+			(at 76.2 88.9 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "RESET"
+			(at 76.2 91.44 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Button_Switch_SMD:SW_SPST_TL3342"
+			(at 76.2 95.25 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 76.2 95.25 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 76.2 95.25 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2093cf22-f710-4fbb-be65-a7e66a8ebc85")
+		)
+		(pin "2"
+			(uuid "bdb20e24-d90e-46a9-ac40-9958bb065bc0")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "SW2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_Push")
+		(at 76.2 82.55 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "56b8280d-4530-4630-96bb-e76ebac51ed1")
+		(property "Reference" "SW1"
+			(at 76.2 76.2 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "BOOT"
+			(at 76.2 78.74 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Button_Switch_SMD:SW_SPST_TL3342"
+			(at 76.2 82.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 76.2 82.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 76.2 82.55 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f5f40ebf-a1ae-4588-9c44-45ae1f6f0ba7")
+		)
+		(pin "2"
+			(uuid "6c631fb6-4373-48d0-8374-8a9275316ad3")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "SW1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:D_TVS")
+		(at 38.1 50.8 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "69fb31fa-8a6a-4c4a-bca6-7e0ca4683155")
+		(property "Reference" "D8"
+			(at 38.1 44.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "PESD3V3L1BA"
+			(at 38.1 46.99 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_SOD-323"
+			(at 38.1 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 38.1 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 38.1 50.8 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "06646847-b8f2-410f-ae59-9e9ed4bf5a00")
+		)
+		(pin "2"
+			(uuid "79cf3e85-2d1c-48db-9b0a-cfc5f3d073f9")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "D8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 63.5 44.45 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "6a9362c6-e012-41d7-ab17-4c2cc812be7b")
+		(property "Reference" "C6"
+			(at 67.31 43.18 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "100nF"
+			(at 67.31 45.72 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+			(at 63.5 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 44.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "56cfe801-8e21-4e1c-9876-436f4b258731")
+		)
+		(pin "2"
+			(uuid "bf93ee07-2e3d-4161-b3fc-605f0733b171")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "C6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 76.2 44.45 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a987f83a-66c4-42b8-93e8-18de6598467a")
+		(property "Reference" "R8"
+			(at 80.01 43.18 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10K"
+			(at 80.01 45.72 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 76.2 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 76.2 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 76.2 44.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "84fad381-b5dc-4599-8329-01af30473797")
+		)
+		(pin "2"
+			(uuid "d12fe273-9cd7-42b1-b204-a569ed482e7a")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "R8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "RF_Module:ESP32-WROOM-32")
+		(at 101.6 69.85 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b971b271-f448-4fff-9999-d767874601e7")
+		(property "Reference" "U4"
+			(at 101.6 30.48 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "ESP32-WROOM-32"
+			(at 101.6 33.02 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "RF_Module:ESP32-WROOM-32"
+			(at 101.6 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.espressif.com/sites/default/files/documentation/esp32-wroom-32_datasheet_en.pdf"
+			(at 101.6 69.85 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 101.6 69.85 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "968986e6-dbab-401e-a553-a281634d74d1")
+		)
+		(pin "2"
+			(uuid "ec512e74-d9d8-44c0-80e8-eef1c189627e")
+		)
+		(pin "3"
+			(uuid "e8f57bf6-a81e-4958-b14f-7bada7f45000")
+		)
+		(pin "4"
+			(uuid "16d25856-5a2a-42eb-b19b-3eb7ebcaf200")
+		)
+		(pin "5"
+			(uuid "2634b5c2-80ff-4924-befe-a5753374cf20")
+		)
+		(pin "6"
+			(uuid "e3199fee-9b20-4945-8eac-4ad2cee0bc59")
+		)
+		(pin "7"
+			(uuid "12fb3a27-188d-4178-9793-9ae135ddf079")
+		)
+		(pin "8"
+			(uuid "1f1838b0-7ab0-45f5-b12a-3b376f60957c")
+		)
+		(pin "9"
+			(uuid "f8d9c7f0-76fd-439c-a22f-3fe7f97c12b5")
+		)
+		(pin "10"
+			(uuid "ada5e008-6e10-4912-aa4b-dea1d307cc5b")
+		)
+		(pin "11"
+			(uuid "78d11ffc-ecd2-4862-8693-b3a6c0ec98fb")
+		)
+		(pin "12"
+			(uuid "e1fc12e7-a83b-4806-a95c-5f84e30e85bb")
+		)
+		(pin "13"
+			(uuid "920070f9-09d1-45bf-bef3-c8705ff9b6e9")
+		)
+		(pin "14"
+			(uuid "8ae01660-ba26-40f7-bbd8-57f1c1421177")
+		)
+		(pin "15"
+			(uuid "87f14c2b-edaf-41d5-a824-3ec651eb53e1")
+		)
+		(pin "16"
+			(uuid "b1947625-9403-4940-83f6-16a0df625d60")
+		)
+		(pin "17"
+			(uuid "738b7546-21f5-4696-8862-f4288df8e617")
+		)
+		(pin "18"
+			(uuid "245c6f4b-0d5b-4ad7-85bb-60b5f6d16d6a")
+		)
+		(pin "19"
+			(uuid "d9157bc9-3e2a-4b50-b892-5927577537fc")
+		)
+		(pin "20"
+			(uuid "7ce308fa-2027-457c-9847-2203594a6219")
+		)
+		(pin "21"
+			(uuid "3b955d17-afa7-4b6c-a2ca-4e914b970c28")
+		)
+		(pin "22"
+			(uuid "50fb584d-9c23-4223-8a88-ee08bc1471ca")
+		)
+		(pin "23"
+			(uuid "eda61989-9410-4a73-b9b4-22bbe9308780")
+		)
+		(pin "24"
+			(uuid "74661b5b-e5ad-4476-9c23-9d7eddde6532")
+		)
+		(pin "25"
+			(uuid "ca521be0-fe5c-4335-a6e7-92e0616d0953")
+		)
+		(pin "26"
+			(uuid "28bb9b4b-2c82-45cf-beb3-919665cfdd77")
+		)
+		(pin "27"
+			(uuid "7857448f-3de1-48e8-ad30-1ca599718183")
+		)
+		(pin "28"
+			(uuid "de8ffa9d-b724-4d33-b586-4ffb867a9808")
+		)
+		(pin "29"
+			(uuid "9cbc3392-d93d-475d-8ee7-5cc5905800a2")
+		)
+		(pin "30"
+			(uuid "24fc356e-ce4b-4752-841b-9b7fd1e72c96")
+		)
+		(pin "31"
+			(uuid "19fb774f-76af-4afe-9197-8a709b05ee00")
+		)
+		(pin "32"
+			(uuid "fbf0c1e3-9c6a-4d4d-9d2d-80e1cbc27379")
+		)
+		(pin "33"
+			(uuid "21d315ef-c1ea-4bec-92b0-f735320b3fa8")
+		)
+		(pin "34"
+			(uuid "0792708c-b414-4d98-b8b7-b29735a8fd19")
+		)
+		(pin "35"
+			(uuid "66e27639-a07e-4fe7-bf72-80ba11ed2e4b")
+		)
+		(pin "36"
+			(uuid "955bedc5-0c69-4c78-9d62-d94ea983ea8b")
+		)
+		(pin "37"
+			(uuid "6d3e4f85-edf0-40e9-9f48-5700f2620b32")
+		)
+		(pin "38"
+			(uuid "b88291b5-93a6-441b-b2f9-b809f75c7053")
+		)
+		(pin "39"
+			(uuid "f61056eb-a757-48bf-ac2a-f4047f191da8")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "U4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 139.7 82.55 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "cdac383b-0057-4876-b059-c409c4a8c239")
+		(property "Reference" "R9"
+			(at 139.7 78.74 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1K"
+			(at 139.7 80.01 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
+			(at 139.7 82.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 139.7 82.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 139.7 82.55 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "adc3bed9-6487-4f1f-a36d-c6c26137c885")
+		)
+		(pin "2"
+			(uuid "270d6d80-cfdb-44d3-8bba-cae7821f607a")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "R9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x04_Pin")
+		(at 165.1 63.5 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "eee5b1ea-3751-45b6-91ec-b583ccd57a38")
+		(property "Reference" "J4"
+			(at 165.1 53.34 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "UART_HDR"
+			(at 165.1 55.88 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
+			(at 165.1 63.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 165.1 63.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 165.1 63.5 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5f8e3124-baa1-4d25-8766-eacd92909cae")
+		)
+		(pin "2"
+			(uuid "52df797a-ca19-451d-afae-ca287b14dad8")
+		)
+		(pin "3"
+			(uuid "9b99debb-658d-4f8f-8229-9816f401f734")
+		)
+		(pin "4"
+			(uuid "c91256bb-4371-427b-9b2d-425a88b14fe6")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "J4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED")
+		(at 152.4 82.55 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "f6121197-ea1b-447c-86a5-c97e51ab6ae1")
+		(property "Reference" "D7"
+			(at 152.4 76.2 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "LED_Blue"
+			(at 152.4 78.74 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric"
+			(at 152.4 82.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 152.4 82.55 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 152.4 82.55 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3bd65140-1e6c-49dd-94f3-19b7fd7d5343")
+		)
+		(pin "2"
+			(uuid "e65ac9b4-2b39-4550-af0d-8a7d8df5270d")
+		)
+		(instances
+			(project "gateway"
+				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55/e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a"
+					(reference "D7")
+					(unit 1)
+				)
+			)
+		)
+	)
+)
