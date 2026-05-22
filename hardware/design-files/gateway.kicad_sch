@@ -25,27 +25,15 @@
 		)
 		(uuid "db6ff26a-0670-426c-a5f9-f7408f8566c5")
 	)
-	(text "ISOLATION BARRIER\n(Optocoupler PC817)"
-		(exclude_from_sim no)
-		(at 46.99 140.97 0)
-		(effects
-			(font
-				(size 1.524 1.524)
-				(italic yes)
-			)
-			(justify left)
-		)
-		(uuid "ef9388f0-30af-4e4d-ac83-5c1434a0e922")
-	)
 	(junction
-		(at 123.19 120.65)
+		(at 127 139.7)
 		(diameter 0)
 		(color 0 0 0 0)
-		(uuid "81cc41aa-08f7-4870-94a2-4665e96b883d")
+		(uuid "55552995-4a29-4257-9e3e-216ae4097bee")
 	)
 	(wire
 		(pts
-			(xy 110.49 76.2) (xy 110.49 101.6)
+			(xy 110.49 76.2) (xy 110.49 107.95)
 		)
 		(stroke
 			(width 0)
@@ -55,7 +43,27 @@
 	)
 	(wire
 		(pts
-			(xy 85.09 114.3) (xy 123.19 107.95)
+			(xy 110.49 139.7) (xy 127 139.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2d475d49-7da2-47ed-b784-691af23a1572")
+	)
+	(wire
+		(pts
+			(xy 110.49 139.7) (xy 110.49 158.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "30b15e46-0265-40c6-9160-a374fdef2398")
+	)
+	(wire
+		(pts
+			(xy 85.09 114.3) (xy 127 114.3)
 		)
 		(stroke
 			(width 0)
@@ -75,7 +83,7 @@
 	)
 	(wire
 		(pts
-			(xy 85.09 120.65) (xy 123.19 114.3)
+			(xy 85.09 120.65) (xy 127 120.65)
 		)
 		(stroke
 			(width 0)
@@ -85,7 +93,7 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 120.65) (xy 123.19 158.75)
+			(xy 127 127) (xy 127 139.7)
 		)
 		(stroke
 			(width 0)
@@ -95,7 +103,7 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 158.75) (xy 46.99 158.75)
+			(xy 110.49 158.75) (xy 46.99 158.75)
 		)
 		(stroke
 			(width 0)
@@ -105,7 +113,7 @@
 	)
 	(wire
 		(pts
-			(xy 110.49 101.6) (xy 123.19 101.6)
+			(xy 110.49 107.95) (xy 127 107.95)
 		)
 		(stroke
 			(width 0)
@@ -154,26 +162,6 @@
 		(pin "VCC_3V3" output
 			(at 85.09 76.2 0)
 			(uuid "a1b2c3d4-1111-2222-3333-444455556666")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(pin "VCC_5V" output
-			(at 85.09 82.55 0)
-			(uuid "a1b2c3d4-1111-2222-3333-444455557777")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(pin "GND" output
-			(at 85.09 88.9 0)
-			(uuid "a1b2c3d4-1111-2222-3333-444455558888")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -247,26 +235,6 @@
 				(justify left)
 			)
 		)
-		(pin "VCC_3V3" input
-			(at 46.99 114.3 180)
-			(uuid "b2c3d4e5-1111-2222-3333-444455557777")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(pin "GND" input
-			(at 46.99 127 180)
-			(uuid "b2c3d4e5-1111-2222-3333-444455558888")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
 		(instances
 			(project "gateway"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
@@ -323,26 +291,6 @@
 				(justify right)
 			)
 		)
-		(pin "VCC_5V" input
-			(at 46.99 152.4 180)
-			(uuid "c3d4e5f6-1111-2222-3333-444455557777")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(pin "GND" input
-			(at 46.99 165.1 180)
-			(uuid "c3d4e5f6-1111-2222-3333-444455558888")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
 		(instances
 			(project "gateway"
 				(path "/e63e39d7-6ac0-4ffd-8aa3-1841a4541b55"
@@ -352,7 +300,7 @@
 		)
 	)
 	(sheet
-		(at 123.19 95.25)
+		(at 127 101.6)
 		(size 44.45 50.8)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -368,7 +316,7 @@
 		)
 		(uuid "e4d5f6a7-8b9c-0d1e-2f3a-4b5c6d7e8f9a")
 		(property "Sheetname" "ESP32 DEVKITV1 Module"
-			(at 123.19 94.5384 0)
+			(at 127 100.8884 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -379,7 +327,7 @@
 			)
 		)
 		(property "Sheetfile" "esp32_module.kicad_sch"
-			(at 123.19 146.6346 0)
+			(at 127 152.9846 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -390,7 +338,7 @@
 			)
 		)
 		(pin "I2C_SCL" bidirectional
-			(at 123.19 107.95 180)
+			(at 127 114.3 180)
 			(uuid "d4e5f6a7-1111-2222-3333-444455556666")
 			(effects
 				(font
@@ -400,7 +348,7 @@
 			)
 		)
 		(pin "I2C_SDA" bidirectional
-			(at 123.19 114.3 180)
+			(at 127 120.65 180)
 			(uuid "d4e5f6a7-1111-2222-3333-44445555cccc")
 			(effects
 				(font
@@ -410,7 +358,7 @@
 			)
 		)
 		(pin "GPIO_RELAY" output
-			(at 123.19 120.65 180)
+			(at 127 127 180)
 			(uuid "d4e5f6a7-1111-2222-3333-444455557777")
 			(effects
 				(font
@@ -420,7 +368,7 @@
 			)
 		)
 		(pin "VCC_3V3" input
-			(at 123.19 101.6 180)
+			(at 127 107.95 180)
 			(uuid "d4e5f6a7-1111-2222-3333-444455558888")
 			(effects
 				(font
@@ -430,28 +378,8 @@
 			)
 		)
 		(pin "GND" input
-			(at 123.19 133.35 180)
+			(at 127 139.7 180)
 			(uuid "d4e5f6a7-1111-2222-3333-444455559999")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(pin "TX" output
-			(at 167.64 107.95 0)
-			(uuid "d4e5f6a7-1111-2222-3333-44445555aaaa")
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(pin "RX" input
-			(at 167.64 114.3 0)
-			(uuid "d4e5f6a7-1111-2222-3333-44445555bbbb")
 			(effects
 				(font
 					(size 1.27 1.27)
