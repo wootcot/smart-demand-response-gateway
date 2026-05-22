@@ -22,6 +22,9 @@ help: ## Show this help message
 	@echo "Firmware (ESP32) — prefix: fw-"
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' firmware/Makefile | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36mfw-%-22s\033[0m %s\n", $$1, $$2}'
 	@echo ""
+	@echo "Hardware (KiCad) — prefix: hw-"
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' hardware/Makefile | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36mhw-%-22s\033[0m %s\n", $$1, $$2}'
+	@echo ""
 
 # === Global targets ===
 
@@ -43,3 +46,8 @@ be-%:
 
 fw-%:
 	$(MAKE) -C firmware $* PORT=$(PORT)
+
+# === Hardware (KiCad) targets ===
+
+hw-%:
+	$(MAKE) -C hardware $*

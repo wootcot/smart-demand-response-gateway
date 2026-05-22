@@ -19,3 +19,20 @@ fp-info-cache
 
 # DRC/ERC reports (regenerated on demand)
 *.rpt
+
+# Loose fabrication outputs (only the zip is committed)
+fabrication/*.gbr
+fabrication/*.gbl
+fabrication/*.gtl
+fabrication/*.gbs
+fabrication/*.gts
+fabrication/*.gbo
+fabrication/*.gto
+fabrication/*.gbp
+fabrication/*.gtp
+fabrication/*.gba
+fabrication/*.gta
+fabrication/*.gm1
+fabrication/*.gbrjob
+fabrication/*.drl
+!fabrication/*.zip

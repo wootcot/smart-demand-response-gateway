@@ -19,8 +19,8 @@ hardware/
 │   └── fp-lib-table                   # Footprint library references
 │
 ├── documentation/                     # High-level viewing artifacts for reviews
-│   ├── schematic_v1.0.pdf            # Combined schematics plotted to PDF
-│   ├── pcb_top_render.png            # 3D render view of assembled board
+│   ├── schematic_v1.0.pdf             # Combined schematics plotted to PDF
+│   ├── pcb_top_render.png             # 3D render view of assembled board
 │   └── BOM.csv                        # Component procurement list
 │
 └── fabrication/                       # Production-ready manufacturing outputs
@@ -92,13 +92,20 @@ Full BOM with supplier info: [`documentation/BOM.csv`](documentation/BOM.csv)
 
 ## Generating Fabrication Outputs
 
-```bash
-# Export Gerbers from KiCad CLI
-kicad-cli pcb export gerbers hardware/design-files/gateway.kicad_pcb -o hardware/fabrication/
-kicad-cli pcb export drill hardware/design-files/gateway.kicad_pcb -o hardware/fabrication/
+From the repository root:
 
-# Export schematic PDF
-kicad-cli sch export pdf hardware/design-files/gateway.kicad_sch -o hardware/documentation/schematic_v1.0.pdf
+```bash
+make hw-all              # Export Gerbers + drill + schematic PDF
+make hw-gerbers          # Export Gerber files only
+make hw-drill            # Export drill files only
+make hw-schematic-pdf    # Export combined schematic PDF
+make hw-clean            # Remove generated outputs
+```
+
+Or directly from the `hardware/` directory:
+
+```bash
+make all
 ```
 
 ## Safety Notes

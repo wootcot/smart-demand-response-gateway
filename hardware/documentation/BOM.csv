@@ -1,0 +1,39 @@
+Reference,Value,Footprint,Quantity,Manufacturer,MPN,Description,Supplier,Unit Cost (USD)
+J1,230VAC_IN,TerminalBlock_bornier-2_P5.08mm,1,Phoenix Contact,1729018,2-pos screw terminal 5.08mm pitch,LCSC,0.35
+F1,5A Fast-Blow,Fuseholder5x20_Horiz_SemiClosed,1,Littelfuse,0215005.MXP,5A 250V ceramic fuse 5x20mm,Mouser,0.45
+D1,P6KE250CA,D_DO-201_P15.24mm_Horizontal,1,Littelfuse,P6KE250CA,250V bidirectional TVS diode,Mouser,0.85
+U1,HLK-PM01,Converter_ACDC_HiLink_HLK-PMxx,1,Hi-Link,HLK-PM01,230VAC to 5VDC 3W AC-DC module,AliExpress,2.50
+C1,100uF/16V,CP_Radial_D6.3mm_P2.50mm,1,Nichicon,UVR1C101MDD,100uF 16V electrolytic capacitor,LCSC,0.12
+U2,AMS1117-3.3,SOT-223-3_TabPin2,1,AMS,AMS1117-3.3,3.3V 1A LDO voltage regulator,LCSC,0.15
+C2,10uF,C_0805_2012Metric,1,Samsung,CL21A106KPFNNNE,10uF 10V X5R ceramic capacitor,LCSC,0.05
+C3,22uF,C_0805_2012Metric,1,Samsung,CL21A226MQQNNNE,22uF 6.3V X5R ceramic capacitor,LCSC,0.06
+J2,SCT-013-030,Jack_3.5mm_Horizontal,1,YHDC,SCT-013-030,30A non-invasive CT sensor + jack,AliExpress,4.50
+R1,33R 1%,R_0805_2012Metric,1,Yageo,RC0805FR-0733RL,33 ohm 1% 0.125W resistor,LCSC,0.01
+R2,10K 1%,R_0805_2012Metric,1,Yageo,RC0805FR-0710KL,10K ohm 1% 0.125W resistor,LCSC,0.01
+R3,10K 1%,R_0805_2012Metric,1,Yageo,RC0805FR-0710KL,10K ohm 1% 0.125W resistor,LCSC,0.01
+C4,10uF,C_0805_2012Metric,1,Samsung,CL21A106KPFNNNE,10uF 10V X5R ceramic capacitor,LCSC,0.05
+C5,10uF,C_0805_2012Metric,1,Samsung,CL21A106KPFNNNE,10uF 10V X5R ceramic capacitor,LCSC,0.05
+R4,1K,R_0805_2012Metric,1,Yageo,RC0805FR-071KL,1K ohm 1% 0.125W resistor,LCSC,0.01
+D2,BAT54,D_SOD-323,1,Nexperia,BAT54,30V Schottky barrier diode,LCSC,0.03
+D3,BAT54,D_SOD-323,1,Nexperia,BAT54,30V Schottky barrier diode,LCSC,0.03
+R5,330R,R_0805_2012Metric,1,Yageo,RC0805FR-07330RL,330 ohm 1% 0.125W resistor,LCSC,0.01
+U3,PC817,DIP-4_W7.62mm,1,Sharp,PC817X2NSZ0F,Optocoupler 5kV isolation CTR 50-300%,LCSC,0.12
+R6,1K,R_0805_2012Metric,1,Yageo,RC0805FR-071KL,1K ohm 1% 0.125W resistor,LCSC,0.01
+Q1,BC547B,TO-92_Inline,1,ON Semi,BC547BTA,NPN transistor 45V 100mA,LCSC,0.03
+D4,1N4148,D_SOD-323,1,Nexperia,1N4148WS,75V 150mA fast switching diode,LCSC,0.02
+K1,SRD-05VDC-SL-C,Relay_SPDT_SANYOU_SRD,1,Songle,SRD-05VDC-SL-C,5V SPDT relay 10A 250VAC,LCSC,0.65
+D5,P6KE250CA,D_DO-201_P15.24mm_Horizontal,1,Littelfuse,P6KE250CA,250V bidirectional TVS diode,Mouser,0.85
+J3,LOAD_OUT,TerminalBlock_bornier-3_P5.08mm,1,Phoenix Contact,1729021,3-pos screw terminal 5.08mm pitch,LCSC,0.50
+D6,LED_Green,LED_0805_2012Metric,1,Everlight,19-217/GHC-YR1S2/3T,Green LED 0805 20mA,LCSC,0.02
+R7,470R,R_0805_2012Metric,1,Yageo,RC0805FR-07470RL,470 ohm 1% 0.125W resistor,LCSC,0.01
+U4,ESP32-WROOM-32,ESP32-WROOM-32,1,Espressif,ESP32-WROOM-32E,WiFi+BT MCU module 4MB flash,LCSC,3.20
+C6,100nF,C_0402_1005Metric,1,Samsung,CL05B104KO5NNNC,100nF 16V X7R ceramic capacitor,LCSC,0.01
+C7,10uF,C_0805_2012Metric,1,Samsung,CL21A106KPFNNNE,10uF 10V X5R ceramic capacitor,LCSC,0.05
+R8,10K,R_0805_2012Metric,1,Yageo,RC0805FR-0710KL,10K ohm 1% 0.125W resistor,LCSC,0.01
+SW1,BOOT,SW_SPST_TL3342,1,E-Switch,TL3342F160QG,Tactile switch SPST 50mA 12V,LCSC,0.08
+SW2,RESET,SW_SPST_TL3342,1,E-Switch,TL3342F160QG,Tactile switch SPST 50mA 12V,LCSC,0.08
+J4,UART_HDR,PinHeader_1x04_P2.54mm_Vertical,1,Generic,PH-1x4-2.54,4-pin male header 2.54mm pitch,LCSC,0.05
+D7,LED_Blue,LED_0805_2012Metric,1,Everlight,19-217/BHC-ZL1M2RY/3T,Blue LED 0805 20mA,LCSC,0.03
+R9,1K,R_0805_2012Metric,1,Yageo,RC0805FR-071KL,1K ohm 1% 0.125W resistor,LCSC,0.01
+D8,PESD3V3L1BA,D_SOD-323,1,Nexperia,PESD3V3L1BA,3.3V ESD protection diode,LCSC,0.04
+U5,ADS1115IDGS,TSSOP-10_3x3mm_P0.5mm,1,Texas Instruments,ADS1115IDGSR,16-bit 860SPS 4-ch delta-sigma ADC I2C,LCSC,4.50
