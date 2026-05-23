@@ -19,6 +19,7 @@
 #include "nvs_flash.h"
 
 #include "core/config.h"
+#include "core/nvs_config.hpp"
 #include "core/gateway_state.hpp"
 #include "features/sensor/current_sensor.hpp"
 #include "features/relay/relay_controller.hpp"
@@ -30,7 +31,8 @@ static const char *TAG = "main";
 static GatewayState gateway_state;
 static CurrentSensor ct_sensor(CT_CALIBRATION_FACTOR);
 static RelayController relay_controller;
-static NetworkClient network_client(gateway_state, relay_controller);
+static NvsConfig nvs_config;
+static NetworkClient network_client(gateway_state, relay_controller, nvs_config);
 
 void Task_ReadSensors(void *pvParameters)
 {
@@ -65,6 +67,9 @@ extern "C" void app_main(void)
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+
+    // Load runtime configuration from NVS (falls back to Kconfig defaults)
+    nvs_config.load();
 
     if (!gateway_state.init()) {
         ESP_LOGE(TAG, "Failed to initialize gateway state");

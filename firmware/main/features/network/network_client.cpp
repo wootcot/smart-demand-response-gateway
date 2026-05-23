@@ -25,8 +25,9 @@
 
 static const char *TAG = "network";
 
-NetworkClient::NetworkClient(GatewayState& state, RelayController& relays) noexcept
-    : state(state), relays(relays)
+NetworkClient::NetworkClient(GatewayState& state, RelayController& relays,
+                             const NvsConfig& config) noexcept
+    : state(state), relays(relays), config(config)
 {
 }
 
@@ -88,14 +89,19 @@ void NetworkClient::event_handler(void *handler_args, esp_event_base_t base,
 
 bool NetworkClient::init() noexcept
 {
-    // Bring up Wi-Fi and TCP/IP stack before any network operations
-    if (!wifi_init_sta()) {
+    // Bring up Wi-Fi using NVS/Kconfig credentials (no hardcoded secrets)
+    if (!wifi_init_sta(config.wifi_ssid(), config.wifi_pass())) {
         ESP_LOGE(TAG, "Wi-Fi initialization failed — cannot start WebSocket");
         return false;
     }
 
+    // Build WebSocket URI from NVS/Kconfig components
+    char uri[URI_BUFFER_SIZE];
+    snprintf(uri, sizeof(uri), "ws://%s:%u/ws?gateway_id=%s",
+             config.ws_host(), config.ws_port(), config.gateway_id());
+
     esp_websocket_client_config_t ws_cfg = {};
-    ws_cfg.uri = WS_URL;
+    ws_cfg.uri = uri;
     ws_cfg.reconnect_timeout_ms = 5000;
     ws_cfg.network_timeout_ms = 10000;
 
@@ -116,7 +122,8 @@ bool NetworkClient::init() noexcept
         return false;
     }
 
-    ESP_LOGI(TAG, "WebSocket client started, telemetry interval=%ums", NETWORK_POLL_INTERVAL_MS);
+    ESP_LOGI(TAG, "WebSocket client started → %s:%u, telemetry interval=%ums",
+             config.ws_host(), config.ws_port(), NETWORK_POLL_INTERVAL_MS);
     return true;
 }
 
@@ -131,8 +138,8 @@ bool NetworkClient::send_telemetry() noexcept
 
     char payload[PAYLOAD_BUFFER_SIZE];
     int len = snprintf(payload, sizeof(payload),
-        "{\"type\":\"telemetry\",\"gateway_id\":\"esp32-gw-001\",\"power_watts\":%.2f}",
-        current_power);
+        "{\"type\":\"telemetry\",\"gateway_id\":\"%s\",\"power_watts\":%.2f}",
+        config.gateway_id(), current_power);
 
     if (esp_websocket_client_send_text(client, payload, len, pdMS_TO_TICKS(1000)) < 0) {
         ESP_LOGW(TAG, "Failed to send telemetry frame");

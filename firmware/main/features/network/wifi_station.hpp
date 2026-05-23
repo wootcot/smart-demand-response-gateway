@@ -18,6 +18,8 @@
  *   3. esp_wifi_init/start — radio bring-up
  *   4. Waits for IP_EVENT_STA_GOT_IP (blocks up to WIFI_CONNECT_TIMEOUT_MS)
  *
+ * @param ssid  Wi-Fi network name (null-terminated, max 32 chars)
+ * @param pass  Wi-Fi password (null-terminated, max 63 chars)
  * @return true if connected and IP acquired, false on timeout or failure.
  */
-bool wifi_init_sta();
+bool wifi_init_sta(const char *ssid, const char *pass);

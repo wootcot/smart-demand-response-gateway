@@ -53,7 +53,7 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base,
     }
 }
 
-bool wifi_init_sta()
+bool wifi_init_sta(const char *ssid, const char *pass)
 {
     s_wifi_event_group = xEventGroupCreate();
     if (s_wifi_event_group == nullptr) {
@@ -83,11 +83,11 @@ bool wifi_init_sta()
     ESP_ERROR_CHECK(esp_event_handler_instance_register(
         IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, nullptr, &instance_got_ip));
 
-    // Configure credentials
+    // Configure credentials from NVS/Kconfig (no hardcoded secrets)
     wifi_config_t wifi_config = {};
-    strlcpy(reinterpret_cast<char *>(wifi_config.sta.ssid), WIFI_SSID,
+    strlcpy(reinterpret_cast<char *>(wifi_config.sta.ssid), ssid,
             sizeof(wifi_config.sta.ssid));
-    strlcpy(reinterpret_cast<char *>(wifi_config.sta.password), WIFI_PASS,
+    strlcpy(reinterpret_cast<char *>(wifi_config.sta.password), pass,
             sizeof(wifi_config.sta.password));
     wifi_config.sta.threshold.authmode = WIFI_AUTH_WPA2_PSK;
 
@@ -95,7 +95,7 @@ bool wifi_init_sta()
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
 
-    ESP_LOGI(TAG, "Wi-Fi station started, waiting for connection...");
+    ESP_LOGI(TAG, "Wi-Fi station started (SSID: %s), waiting for connection...", ssid);
 
     // Block until connected or failed
     EventBits_t bits = xEventGroupWaitBits(

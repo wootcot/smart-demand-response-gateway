@@ -19,15 +19,20 @@
 #include "driver/gpio.h"
 
 // =============================================================================
-// USER CONFIGURATION — Update these values for your deployment
+// USER CONFIGURATION — Set via `idf.py menuconfig` → "Gateway Configuration"
+// Runtime overrides can be provisioned into NVS (see nvs_config.hpp).
 // =============================================================================
 
-// Wi-Fi credentials (move to NVS or Kconfig for production)
-#define WIFI_SSID "REDACTED"
-#define WIFI_PASS "REDACTED"
+#include "sdkconfig.h"
 
-// WebSocket backend URL (include gateway_id as query param)
-#define WS_URL "ws://192.168.101.4:8080/ws?gateway_id=esp32-gw-001"
+// Wi-Fi credentials (Kconfig defaults, overridable via NVS at runtime)
+#define WIFI_SSID CONFIG_GATEWAY_WIFI_SSID
+#define WIFI_PASS CONFIG_GATEWAY_WIFI_PASS
+
+// WebSocket backend (Kconfig defaults, overridable via NVS at runtime)
+#define WS_HOST   CONFIG_GATEWAY_WS_HOST
+#define WS_PORT   CONFIG_GATEWAY_WS_PORT
+#define GATEWAY_ID CONFIG_GATEWAY_ID
 
 // =============================================================================
 // SYSTEM CONFIGURATION — Typically no changes needed below this line

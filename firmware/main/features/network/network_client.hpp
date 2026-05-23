@@ -15,6 +15,7 @@
 
 #include "esp_websocket_client.h"
 #include "core/gateway_state.hpp"
+#include "core/nvs_config.hpp"
 #include "features/relay/relay_controller.hpp"
 
 class NetworkClient {
@@ -25,8 +26,10 @@ private:
     // References to collaborating objects (non-owning)
     GatewayState& state;
     RelayController& relays;
+    const NvsConfig& config;
 
     static constexpr size_t PAYLOAD_BUFFER_SIZE = 128;
+    static constexpr size_t URI_BUFFER_SIZE = 192;
 
     void handle_message(const char *data, int len) noexcept;
 
@@ -35,7 +38,8 @@ private:
                               int32_t event_id, void *event_data);
 
 public:
-    explicit NetworkClient(GatewayState& state, RelayController& relays) noexcept;
+    explicit NetworkClient(GatewayState& state, RelayController& relays,
+                           const NvsConfig& config) noexcept;
     ~NetworkClient() = default;
 
     // Non-copyable (owns connection resource)

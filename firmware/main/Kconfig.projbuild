@@ -1,0 +1,42 @@
+menu "Gateway Configuration"
+
+    menu "Wi-Fi Credentials"
+        config GATEWAY_WIFI_SSID
+            string "Wi-Fi SSID"
+            default "my_network"
+            help
+                The SSID (network name) of the Wi-Fi access point to connect to.
+                This serves as the build-time default. Can be overridden at runtime
+                via NVS (namespace: "wifi", key: "ssid").
+
+        config GATEWAY_WIFI_PASS
+            string "Wi-Fi Password"
+            default ""
+            help
+                The WPA2 password for the Wi-Fi access point.
+                This serves as the build-time default. Can be overridden at runtime
+                via NVS (namespace: "wifi", key: "password").
+    endmenu
+
+    menu "Backend Connection"
+        config GATEWAY_WS_HOST
+            string "WebSocket server host"
+            default "192.168.1.100"
+            help
+                Hostname or IP address of the backend WebSocket server.
+
+        config GATEWAY_WS_PORT
+            int "WebSocket server port"
+            default 8080
+            help
+                TCP port of the backend WebSocket server.
+
+        config GATEWAY_ID
+            string "Gateway device ID"
+            default "esp32-gw-001"
+            help
+                Unique identifier for this gateway device. Used in WebSocket
+                connection URL and telemetry payloads.
+    endmenu
+
+endmenu

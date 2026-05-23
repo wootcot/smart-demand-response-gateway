@@ -5,6 +5,7 @@ idf_component_register(
     SRCS
         "main.cpp"
         "core/gateway_state.cpp"
+        "core/nvs_config.cpp"
         "features/sensor/current_sensor.cpp"
         "features/network/network_client.cpp"
         "features/network/wifi_station.cpp"
