@@ -20,8 +20,7 @@
 
 #include "features/sensor/current_sensor.hpp"
 #include "esp_log.h"
-#include "esp_timer.h"
-#include "freertos/FreeRTOS.h"
+#include "freertos/FreeRTOS.h" // IWYU pragma: keep
 #include "freertos/task.h"
 
 #include <cmath>
