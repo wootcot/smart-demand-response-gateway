@@ -190,3 +190,15 @@ DATA FLOW SUMMARY:
 ```
 
 > **Note:** To generate the schematic image from source, open `hardware/design-files/*.kicad_sch` in KiCad 10.x and export via _File → Export → SVG/PNG_. Place the exported image at `hardware/documentation/pcb_top_render.png`.
+
+### Technical Justification Matrix
+
+| Component                         | Engineering Rationale                                                                                                                                                                                                                                                                                                                                               |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **External ADS1115 (16-bit ADC)** | The ESP32's internal 12-bit ADC is notoriously non-linear, suffers from high electronic noise, and lacks the resolution required for precision RMS calculations at low current draws. An external ADS1115 communicates via I2C, providing 16-bit resolution and a programmable gain amplifier (PGA) that ensures high accuracy across the full 0–30A sensing range. |
+| **Optoisolated Relay Module**     | Essential for galvanic isolation. Ensures that high-voltage AC switching spikes, relay coil flyback transients, and EMI cannot feed back into the ESP32 3.3V logic rail — preventing MCU crashes, GPIO pin damage, or safety hazards. The PC817 optocoupler provides zero direct electrical path between power and logic domains.                                   |
+| **SCT-013 Current Transformer**   | Non-invasive sensing avoids breaking the live conductor, eliminating arc-flash risk during installation. Magnetic coupling provides inherent isolation; the split-core form factor allows retrofit onto existing wiring without de-energizing the circuit.                                                                                                          |
+| **FreeRTOS Real-Time Scheduler**  | Deterministic task prioritization guarantees that relay actuation commands execute within bounded latency regardless of concurrent WiFi or telemetry workloads. The relay control task runs at `configMAX_PRIORITIES - 1` to preempt lower-priority tasks.                                                                                                          |
+| **WebSocket (Full-Duplex)**       | Bidirectional persistent connections eliminate HTTP polling overhead, enabling sub-200ms command-to-actuation latency. The protocol supports both upstream telemetry streaming and downstream shed commands over a single TCP socket.                                                                                                                               |
+
+---
