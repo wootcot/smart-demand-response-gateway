@@ -10,7 +10,7 @@
 		(rev "1.0")
 		(company "Ailsh Giri")
 		(comment 1 "Hi-Link HLK-PM01 (230VAC to 5VDC) + AMS1117-3.3")
-		(comment 2 "Fused AC input with 5A fast-blow ceramic fuse")
+		(comment 2 "AC/DC power conversion for ESP32 and relay module")
 	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_01x02"
@@ -680,7 +680,7 @@
 			(embedded_fonts no)
 		)
 	)
-	(text "POWER SUPPLY SECTION\n230V AC to HLK-PM01 to 5V DC to AMS1117 to 3.3V DC\nF1: 5A fast-blow ceramic fuse\nD1: P6KE250CA bidirectional TVS"
+	(text "POWER SUPPLY SECTION\n230V AC to HLK-PM01 to 5V DC to AMS1117 to 3.3V DC"
 		(exclude_from_sim no)
 		(at 25.908 100.584 0)
 		(effects

@@ -15,7 +15,7 @@
 		(comment 4 "Open Source Hardware - MIT License")
 	)
 	(lib_symbols)
-	(text "SMART DEMAND RESPONSE GATEWAY\nTop-Level Hierarchical Sheet\n\n230V AC Mains > Fused Input > CT Sensor + Relay\nESP32 Edge Controller with WiFi/WebSocket\nOpto-isolated relay for galvanic separation"
+	(text "SMART DEMAND RESPONSE GATEWAY\nTop-Level Hierarchical Sheet\n\n230V AC Mains > CT Sensor + Relay\nESP32 Edge Controller with WiFi/WebSocket\nOpto-isolated relay for galvanic separation"
 		(exclude_from_sim no)
 		(at 101.6 38.1 0)
 		(effects
