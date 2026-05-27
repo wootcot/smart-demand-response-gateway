@@ -212,7 +212,7 @@ class DashboardScreen extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  gridStatus.totalLoadWatts.toStringAsFixed(1),
+                  gridStatus.totalLoadWatts.toStringAsFixed(2),
                   style: theme.textTheme.headlineLarge?.copyWith(
                     color: loadColor,
                     fontWeight: FontWeight.bold,
